@@ -1,0 +1,4 @@
+/remitlane
+.env
+*.test
+.DS_Store
