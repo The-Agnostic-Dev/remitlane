@@ -1,0 +1,24 @@
+version: "2"
+sql:
+  - engine: postgresql
+    schema: migrations
+    queries: internal/db/queries
+    gen:
+      go:
+        package: db
+        out: internal/db
+        sql_package: pgx/v5
+        emit_empty_slices: true
+        overrides:
+          - db_type: pg_catalog.numeric
+            go_type: string
+          - db_type: pg_catalog.numeric
+            go_type: string
+            nullable: true
+          - db_type: timestamptz
+            go_type: time.Time
+          - db_type: timestamptz
+            go_type:
+              import: github.com/jackc/pgx/v5/pgtype
+              type: Timestamptz
+            nullable: true
