@@ -31,6 +31,9 @@ func TestFormat(t *testing.T) {
 	if got := Format(1850000, UGX); got != "UGX 1,850,000" {
 		t.Errorf("got %q", got)
 	}
+	if got := Format(-99, USD); got != "USD -0.99" {
+		t.Errorf("got %q", got)
+	}
 }
 
 func TestDecimalToMinor(t *testing.T) {

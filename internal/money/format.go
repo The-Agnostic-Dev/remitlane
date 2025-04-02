@@ -11,6 +11,8 @@ func Format(minor int64, c Currency) string {
 
 // Group inserts thousands separators into a plain decimal string.
 func Group(dec string) string {
+	neg := strings.HasPrefix(dec, "-")
+	dec = strings.TrimPrefix(dec, "-")
 	whole, frac, hasFrac := strings.Cut(dec, ".")
 	var b strings.Builder
 	for i, r := range whole {
@@ -22,6 +24,9 @@ func Group(dec string) string {
 	out := b.String()
 	if hasFrac {
 		out += "." + frac
+	}
+	if neg {
+		out = "-" + out
 	}
 	return out
 }
