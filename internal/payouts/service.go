@@ -116,6 +116,13 @@ func (s *Service) Create(ctx context.Context, partner db.Partner, req CreateRequ
 	}
 	var p db.Payout
 	err = s.store.InTx(ctx, func(q *db.Queries, tx pgx.Tx) error {
+		locked, err := q.LockQuote(ctx, db.LockQuoteParams{ID: quote.ID, PartnerID: partner.ID})
+		if err != nil {
+			return err
+		}
+		if locked.UsedAt.Valid {
+			return errorf(CodeQuoteUsed, "quote %s has already been used", quote.ID)
+		}
 		if err := checkFunds(ctx, tx, partner.ID, in.src.Currency, in.src.Minor+in.fee); err != nil {
 			return err
 		}
