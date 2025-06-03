@@ -1,3 +1,9 @@
+// Command remitlane runs the Remitlane server.
+//
+//	remitlane            serve the API, console and worker (same as "serve")
+//	remitlane migrate    apply database migrations and exit
+//	remitlane seed       reset the database to the demo data and exit
+//	remitlane healthcheck  exit 0 if the local server answers /healthz
 package main
 
 import (
@@ -6,59 +12,78 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
-	"github.com/go-chi/chi/v5"
-
-	"github.com/remitlane/remitlane/internal/api"
-	"github.com/remitlane/remitlane/internal/clock"
+	"github.com/remitlane/remitlane/internal/app"
 	"github.com/remitlane/remitlane/internal/config"
 	"github.com/remitlane/remitlane/internal/migrate"
 	"github.com/remitlane/remitlane/internal/obs"
-	"github.com/remitlane/remitlane/internal/quotes"
-	"github.com/remitlane/remitlane/internal/rates"
 	"github.com/remitlane/remitlane/internal/store"
 )
 
 func main() {
+	cmd := "serve"
+	if len(os.Args) > 1 {
+		cmd = os.Args[1]
+	}
 	cfg, err := config.Load()
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintln(os.Stderr, "config:", err)
 		os.Exit(2)
 	}
 	log := obs.NewLogger(os.Stdout, cfg.LogLevel, cfg.LogFormat)
-	ctx := context.Background()
+	slog.SetDefault(log)
 
-	clk, err := clock.New(cfg.BusinessTZ)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	switch cmd {
+	case "serve":
+		err = serve(ctx, cfg, log)
+	case "migrate":
+		err = runMigrate(ctx, cfg, log)
+	case "seed":
+		cfg.SeedOnStart = true
+		_, err = app.New(ctx, cfg, log)
+	case "healthcheck":
+		err = healthcheck(cfg.Port)
+	default:
+		err = fmt.Errorf("unknown command %q (want serve, migrate, seed or healthcheck)", cmd)
+	}
 	if err != nil {
-		log.Error("clock", "err", err)
+		log.Error("exit", "cmd", cmd, "err", err)
 		os.Exit(1)
 	}
-	st, err := store.Open(ctx, cfg.DatabaseURL, cfg.DBMaxConns)
+}
+
+func serve(ctx context.Context, cfg config.Config, log *slog.Logger) error {
+	a, err := app.New(ctx, cfg, log)
 	if err != nil {
-		log.Error("db", "err", err)
-		os.Exit(1)
+		return err
 	}
-	if err := migrate.Up(ctx, st.Pool, log); err != nil {
-		log.Error("migrate", "err", err)
-		os.Exit(1)
-	}
-	feed, err := rates.NewFixedFeed(cfg.Rates)
+	return a.Run(ctx)
+}
+
+func runMigrate(ctx context.Context, cfg config.Config, log *slog.Logger) error {
+	st, err := store.Open(ctx, cfg.DatabaseURL, 2)
 	if err != nil {
-		log.Error("rates", "err", err)
-		os.Exit(1)
+		return err
 	}
-	quoter := rates.NewQuoter(feed, clk, cfg.QuoteTTL)
+	defer st.Close()
+	return migrate.Up(ctx, st.Pool, log)
+}
 
-	// TODO: payouts service, worker
-	partnerAPI := api.New(api.Deps{Store: st, Quotes: quotes.New(st, quoter, clk), Clock: clk, Log: log, RatePerMinute: cfg.APIRatePerMin})
-
-	r := chi.NewRouter()
-	r.Use(obs.Middleware(log))
-	r.Get("/healthz", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte("ok")) })
-	r.Mount("/v1", partnerAPI.Routes())
-
-	log.Info("listening", "port", cfg.Port)
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), r); err != nil {
-		log.Error("serve", "err", err)
+func healthcheck(port int) error {
+	c := &http.Client{Timeout: 3 * time.Second}
+	resp, err := c.Get(fmt.Sprintf("http://127.0.0.1:%d/healthz", port))
+	if err != nil {
+		return err
 	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("healthz answered %d", resp.StatusCode)
+	}
+	return nil
 }
