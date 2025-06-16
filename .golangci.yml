@@ -1,0 +1,25 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - bodyclose
+    - errorlint
+    - gofmt
+    - goimports
+    - revive
+    - unconvert
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/remitlane/remitlane
+  revive:
+    rules:
+      - name: package-comments
+      - name: var-naming
+      - name: indent-error-flow
+      - name: error-strings
+
+issues:
+  exclude-dirs:
+    - internal/db
