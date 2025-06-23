@@ -1,0 +1,47 @@
+# Local stack: app, Postgres and Redis. The app reseeds demo data on start.
+#   docker compose up --build      then open http://localhost:5121
+services:
+  app:
+    build: .
+    ports:
+      - "5121:5121"
+    environment:
+      PORT: "5121"
+      APP_BASE_URL: http://localhost:5121
+      DATABASE_URL: postgres://remitlane:remitlane@postgres:5432/remitlane?sslmode=disable
+      REDIS_ADDR: redis:6379
+      LOG_FORMAT: json
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:5121/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: remitlane
+      POSTGRES_PASSWORD: remitlane
+      POSTGRES_DB: remitlane
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U remitlane -d remitlane"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    tmpfs:
+      - /var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
