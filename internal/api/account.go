@@ -52,3 +52,24 @@ func (a *API) getLimits(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+type corridor struct {
+	SourceCurrency      string `json:"source_currency"`
+	DestinationCurrency string `json:"destination_currency"`
+	Channel             string `json:"channel"`
+	SpreadBps           int64  `json:"spread_bps"`
+	FeeMinor            int64  `json:"fee_minor"`
+	MinAmountMinor      int64  `json:"min_destination_amount_minor"`
+	MaxAmountMinor      int64  `json:"max_destination_amount_minor"`
+}
+
+func (a *API) listCorridors(w http.ResponseWriter, r *http.Request) {
+	all := rates.All()
+	data := make([]corridor, 0, len(all))
+	for _, c := range all {
+		data = append(data, corridor{
+			SourceCurrency: string(c.From), DestinationCurrency: string(c.To), Channel: string(c.Channel),
+			SpreadBps: c.SpreadBps, FeeMinor: c.FeeMinor, MinAmountMinor: c.MinMinor, MaxAmountMinor: c.MaxMinor,
+		})
+	}
+	httpx.WriteJSON(w, http.StatusOK, map[string]any{"object": "list", "data": data})
+}

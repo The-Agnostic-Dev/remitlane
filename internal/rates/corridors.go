@@ -49,3 +49,9 @@ func Find(from, to money.Currency, ch Channel) (Corridor, bool) {
 	return Corridor{}, false
 }
 
+// All returns every corridor, for the corridors endpoint.
+func All() []Corridor {
+	out := make([]Corridor, len(corridors))
+	copy(out, corridors)
+	return out
+}

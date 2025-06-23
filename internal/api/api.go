@@ -54,6 +54,7 @@ func New(d Deps) *API {
 func (a *API) Routes() http.Handler {
 	r := chi.NewRouter()
 	r.Use(a.authenticate, a.rateLimit)
+	r.Get("/corridors", a.listCorridors)
 	r.Post("/quotes", a.createQuote)
 	r.Get("/quotes/{id}", a.getQuote)
 	r.With(a.idempotent).Post("/payouts", a.createPayout)
