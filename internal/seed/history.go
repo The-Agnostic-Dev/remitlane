@@ -92,6 +92,9 @@ func (g *generator) history(ctx context.Context, q *db.Queries, tx pgx.Tx) error
 		}
 	}
 
+	if err := g.batch(ctx, q, tx, today.AddDate(0, 0, -1).Add(10*time.Hour)); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -149,6 +152,28 @@ func (g *generator) randomStatus() domain.Status {
 	return domain.Completed
 }
 
+// batch writes yesterday's settlement batch for Accra Freight: 25 payouts
+// booked in one request, so they share a created_at.
+func (g *generator) batch(ctx context.Context, q *db.Queries, tx pgx.Tx, at time.Time) error {
+	p := Partners[2]
+	id := "bat_" + randHex(10)
+	ref := "AF-SETTLE-" + at.Format("20060102")
+	if _, err := q.CreateBatch(ctx, db.CreateBatchParams{ID: id, PartnerID: p.ID, Reference: ref, ItemCount: 25}); err != nil {
+		return err
+	}
+	if _, err := tx.Exec(ctx, `UPDATE payout_batches SET created_at = $2 WHERE id = $1`, id, at); err != nil {
+		return err
+	}
+	for i := range 25 {
+		mix := mixes[p.ID][i%2]
+		s := spec{partner: p, mix: mix, destMajor: g.amount(mix), at: at, status: domain.Completed,
+			ref: fmt.Sprintf("%s-%02d", ref, i+1), batchID: id}
+		if _, err := g.insert(ctx, q, tx, s); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 func (g *generator) recipient(country string, ch rates.Channel) (name, bank, account, msisdn string) {
 	ns := names[country]
