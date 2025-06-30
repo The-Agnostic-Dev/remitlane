@@ -1,0 +1,222 @@
+openapi: 3.1.0
+info:
+  title: Remitlane API
+  version: "1.6"
+  description: |
+    Quote and send payouts to bank accounts and mobile money in Nigeria, Kenya, Ghana and Uganda.
+    Amounts are integers in minor units (UGX has no minor unit). See docs/api.md for the narrative guide.
+servers:
+  - url: https://api.remitlane.com/v1
+  - url: https://sandbox.remitlane.com/v1
+  - url: http://localhost:5121/v1
+security:
+  - apiKey: []
+paths:
+  /corridors:
+    get:
+      summary: List corridors with spreads, fees and limits
+      responses:
+        "200":
+          description: Corridors
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object: { type: string, const: list }
+                  data: { type: array, items: { $ref: "#/components/schemas/Corridor" } }
+  /quotes:
+    post:
+      summary: Create a quote
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/QuoteRequest" }
+      responses:
+        "201": { description: Quote, content: { application/json: { schema: { $ref: "#/components/schemas/Quote" } } } }
+        "422": { $ref: "#/components/responses/Error" }
+  /quotes/{id}:
+    get:
+      summary: Get a quote
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Quote, content: { application/json: { schema: { $ref: "#/components/schemas/Quote" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+  /payouts:
+    post:
+      summary: Create a payout from a quote
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PayoutRequest" }
+      responses:
+        "201": { description: Payout, content: { application/json: { schema: { $ref: "#/components/schemas/Payout" } } } }
+        "409": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+    get:
+      summary: List payouts, newest first
+      parameters:
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 20 } }
+        - { name: cursor, in: query, schema: { type: string }, description: next_cursor from the previous page }
+        - { name: status, in: query, schema: { $ref: "#/components/schemas/Status" } }
+        - { name: reference, in: query, schema: { type: string } }
+        - { name: batch_id, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: A page of payouts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  object: { type: string, const: list }
+                  data: { type: array, items: { $ref: "#/components/schemas/Payout" } }
+                  has_more: { type: boolean }
+                  next_cursor: { type: string }
+  /payouts/{id}:
+    get:
+      summary: Get a payout
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Payout, content: { application/json: { schema: { $ref: "#/components/schemas/Payout" } } } }
+        "404": { $ref: "#/components/responses/Error" }
+  /balances:
+    get:
+      summary: Balances per currency
+      responses:
+        "200":
+          description: Balances
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        currency: { $ref: "#/components/schemas/Currency" }
+                        available_minor: { type: integer }
+                        held_minor: { type: integer }
+components:
+  securitySchemes:
+    apiKey: { type: http, scheme: bearer }
+  parameters:
+    Id: { name: id, in: path, required: true, schema: { type: string } }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      schema: { type: string, maxLength: 255 }
+      description: Retry safely; the same key and body return the first response.
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: object
+                properties:
+                  code: { type: string }
+                  message: { type: string }
+                  field: { type: string }
+                  item: { type: integer }
+              request_id: { type: string }
+  schemas:
+    Currency: { type: string, enum: [USD, NGN, KES, GHS, UGX] }
+    Channel: { type: string, enum: [bank, mobile_money] }
+    Status: { type: string, enum: [pending, submitted, processing, completed, failed, reversed] }
+    Corridor:
+      type: object
+      properties:
+        source_currency: { $ref: "#/components/schemas/Currency" }
+        destination_currency: { $ref: "#/components/schemas/Currency" }
+        channel: { $ref: "#/components/schemas/Channel" }
+        spread_bps: { type: integer }
+        fee_minor: { type: integer }
+        min_destination_amount_minor: { type: integer }
+        max_destination_amount_minor: { type: integer }
+    QuoteRequest:
+      type: object
+      required: [source_currency, destination_currency, channel, amount_minor]
+      properties:
+        source_currency: { $ref: "#/components/schemas/Currency" }
+        destination_currency: { $ref: "#/components/schemas/Currency" }
+        channel: { $ref: "#/components/schemas/Channel" }
+        amount_minor: { type: integer, minimum: 1 }
+        amount_type: { type: string, enum: [source, destination], default: source }
+    Quote:
+      type: object
+      properties:
+        id: { type: string, example: qt_4b0d9e2c7a51f3e86d10 }
+        object: { type: string, const: quote }
+        source_currency: { $ref: "#/components/schemas/Currency" }
+        destination_currency: { $ref: "#/components/schemas/Currency" }
+        channel: { $ref: "#/components/schemas/Channel" }
+        source_amount_minor: { type: integer }
+        destination_amount_minor: { type: integer }
+        fee_minor: { type: integer }
+        total_debit_minor: { type: integer }
+        rate: { type: string, description: mid_rate less spread, six decimals }
+        mid_rate: { type: string }
+        spread_bps: { type: integer }
+        expires_at: { type: string, format: date-time, description: 15 minutes after created_at }
+        created_at: { type: string, format: date-time }
+        used: { type: boolean }
+    Recipient:
+      type: object
+      required: [name, country]
+      properties:
+        name: { type: string }
+        country: { type: string, enum: [NG, KE, GH, UG] }
+        bank_code: { type: string }
+        account_number: { type: string }
+        msisdn: { type: string }
+    PayoutRequest:
+      type: object
+      required: [quote_id, reference, recipient]
+      properties:
+        quote_id: { type: string }
+        reference: { type: string, maxLength: 64 }
+        narration: { type: string }
+        recipient: { $ref: "#/components/schemas/Recipient" }
+    Payout:
+      type: object
+      properties:
+        id: { type: string }
+        object: { type: string, const: payout }
+        reference: { type: string }
+        status: { $ref: "#/components/schemas/Status" }
+        channel: { $ref: "#/components/schemas/Channel" }
+        quote_id: { type: string }
+        batch_id: { type: string }
+        source_currency: { $ref: "#/components/schemas/Currency" }
+        source_amount_minor: { type: integer }
+        fee_minor: { type: integer }
+        destination_currency: { $ref: "#/components/schemas/Currency" }
+        destination_amount_minor: { type: integer }
+        rate: { type: string }
+        recipient: { $ref: "#/components/schemas/Recipient" }
+        failure:
+          type: object
+          properties:
+            code: { type: string }
+            message: { type: string }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+        completed_at: { type: string, format: date-time }
+    Batch:
+      type: object
+      properties:
+        id: { type: string }
+        object: { type: string, const: batch }
+        reference: { type: string }
+        item_count: { type: integer }
+        created_at: { type: string, format: date-time }
+        payouts: { type: array, items: { $ref: "#/components/schemas/Payout" } }
