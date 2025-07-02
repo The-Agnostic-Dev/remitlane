@@ -6,8 +6,24 @@ import (
 	"github.com/remitlane/remitlane/internal/domain"
 )
 
+// MapV2 maps a v2 transfer status to a payout status.
+//
+// v2 statuses: QUEUED, PROCESSING, ON_HOLD, COMPLETED, FAILED, REVERSED.
+func MapV2(s string) domain.Status {
+	switch strings.ToUpper(strings.TrimSpace(s)) {
+	case "QUEUED", "PROCESSING":
+		return domain.Processing
+	case "COMPLETED":
+		return domain.Completed
+	case "REVERSED":
+		return domain.Reversed
+	default:
+		return domain.Failed
+	}
+}
 
-// MapV1 maps a Swiftpay transfer state to a payout status.
+// MapV1 maps a legacy v1 webhook state. Some older Swiftpay accounts still
+// send v1 webhooks; see docs/sandbox.md.
 func MapV1(s string) domain.Status {
 	switch strings.ToLower(strings.TrimSpace(s)) {
 	case "pending", "processing":

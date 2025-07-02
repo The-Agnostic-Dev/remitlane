@@ -16,7 +16,7 @@ import (
 	"github.com/remitlane/remitlane/internal/providers"
 )
 
-// Client calls the Swiftpay transfers API (v1).
+// Client calls the Swiftpay transfers API (v2).
 type Client struct {
 	base string
 	key  string
@@ -75,7 +75,7 @@ func (c *Client) Send(ctx context.Context, r providers.TransferRequest) (provide
 	if err != nil {
 		return providers.Result{}, err
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.base+"/v1/transfers", bytes.NewReader(body))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.base+"/v2/transfers", bytes.NewReader(body))
 	if err != nil {
 		return providers.Result{}, err
 	}
@@ -85,7 +85,7 @@ func (c *Client) Send(ctx context.Context, r providers.TransferRequest) (provide
 
 // Status fetches a transfer by Swiftpay id.
 func (c *Client) Status(ctx context.Context, providerRef string) (providers.Result, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.base+"/v1/transfers/"+url.PathEscape(providerRef), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.base+"/v2/transfers/"+url.PathEscape(providerRef), nil)
 	if err != nil {
 		return providers.Result{}, err
 	}
@@ -125,7 +125,7 @@ func (c *Client) classify(err error) error {
 }
 
 func result(t Transfer) providers.Result {
-	st := MapV1(t.Status)
+	st := MapV2(t.Status)
 	res := providers.Result{ProviderRef: t.ID, RawStatus: t.Status, Status: st}
 	if t.Reason != "" {
 		res.FailureCode, res.FailureMessage = t.Reason, ReasonText(t.Reason)
