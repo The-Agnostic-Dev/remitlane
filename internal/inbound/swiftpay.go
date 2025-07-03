@@ -28,7 +28,7 @@ func (h *Handler) swiftpay(w http.ResponseWriter, r *http.Request) {
 	}
 	outcome := h.apply(r.Context(), u.Reference, payouts.Update{
 		Status: u.Status, ProviderRef: u.ProviderRef, Source: providers.Swiftpay,
-		Detail:      "webhook: " + u.RawStatus,
+		Detail:      u.Version + " webhook: " + u.RawStatus,
 		FailureCode: failureCode(u), FailureMessage: failureMessage(u),
 	})
 	h.record(r.Context(), providers.Swiftpay, u.Reference, u.RawStatus, true, outcome, body)
