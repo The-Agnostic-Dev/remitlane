@@ -29,3 +29,18 @@ live service: the create call answers `202 Accepted` with status `QUEUED`, and t
 
 Failed webhook deliveries are retried three times, two seconds apart.
 
+## MoMoBridge (mobile money)
+
+`POST /v1/disbursements` (answers `201` with status `PENDING`), `GET /v1/disbursements/{id}`, `X-Api-Key` auth.
+Callbacks go to `/webhooks/momobridge` with `X-MoMoBridge-Signature: <base64 HMAC-SHA256 of the raw body>`. The body
+is UTF-8 JSON and MoMoBridge does not escape HTML characters (`&` stays `&`).
+
+| Recipient number ends in | Outcome |
+| --- | --- |
+| `0000` | `FAILED` with `SUBSCRIBER_NOT_FOUND` |
+| `5555` | `SUCCESSFUL` but no callback |
+| anything else | `SUCCESSFUL` after `MOMOBRIDGE_SANDBOX_DELAY` |
+
+KES and UGX amounts must be whole shillings; anything else is refused with `422 INVALID_AMOUNT`, like the live rails.
+GHS takes pesewas.
+
