@@ -1,0 +1,63 @@
+{{define "content"}}
+<h1>Payouts</h1>
+<form method="get" action="/ops/payouts" class="filters" id="payout-filters">
+  <label>Partner
+    <select name="partner" data-autosubmit>
+      <option value="">All partners</option>
+      {{$f := .Data.Filter}}
+      {{range .Data.Partners}}<option value="{{.ID}}" {{if eq .ID $f.PartnerID}}selected{{end}}>{{.Name}}</option>{{end}}
+    </select>
+  </label>
+  <label>Status
+    <select name="status" data-autosubmit>
+      <option value="">Any status</option>
+      {{range .Data.Statuses}}<option value="{{.}}" {{if eq (print .) $f.Status}}selected{{end}}>{{label (print .)}}</option>{{end}}
+    </select>
+  </label>
+  <label>Currency
+    <select name="currency" data-autosubmit>
+      <option value="">Any currency</option>
+      {{range .Data.Currencies}}<option value="{{.}}" {{if eq (print .) $f.Currency}}selected{{end}}>{{.}}</option>{{end}}
+    </select>
+  </label>
+  <label>Provider
+    <select name="provider" data-autosubmit>
+      <option value="">Any provider</option>
+      {{range .Data.Providers}}<option value="{{.}}" {{if eq . $f.Provider}}selected{{end}}>{{provider .}}</option>{{end}}
+    </select>
+  </label>
+  <label>Search
+    <input type="search" name="q" value="{{$f.Search}}" placeholder="Payout id, reference or recipient">
+  </label>
+  <button type="submit">Filter</button>
+  <a href="/ops/payouts" class="muted">Clear</a>
+</form>
+
+{{if .Data.Rows}}
+<p class="muted" id="payouts-count">Showing {{.Data.From}} to {{.Data.To}} of {{.Data.Total}} payouts</p>
+<table class="grid" id="payouts">
+  <thead><tr><th>Reference</th><th>Partner</th><th>Recipient</th><th>Channel</th><th class="num">Amount</th><th class="num">Debit</th><th>Status</th><th>Created</th></tr></thead>
+  <tbody>
+  {{range .Data.Rows}}
+    <tr data-payout-id="{{.ID}}">
+      <td><a href="/ops/payouts/{{.ID}}">{{.Reference}}</a><div class="sub mono">{{.ID}}</div></td>
+      <td>{{.PartnerName}}</td>
+      <td>{{.RecipientName}}<div class="sub">{{.RecipientCountry}} · {{if .Msisdn}}{{.Msisdn}}{{else}}{{.BankCode}} {{.AccountNumber}}{{end}}</div></td>
+      <td>{{label .Channel}}<div class="sub">{{provider .Provider}}</div></td>
+      <td class="num amount">{{amount .DestAmountMinor .DestCurrency}}</td>
+      <td class="num">{{amount .SourceAmountMinor .SourceCurrency}}</td>
+      <td><span class="status {{.Status}}">{{.Status}}</span></td>
+      <td title="{{when .CreatedAt}}">{{when .CreatedAt}}</td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+<nav class="pager">
+  {{if gt .Data.Filter.Page 1}}<a href="?page={{add .Data.Filter.Page -1}}">Previous</a>{{end}}
+  <span>Page {{.Data.Filter.Page}} of {{.Data.Pages}}</span>
+  {{if lt .Data.Filter.Page .Data.Pages}}<a href="?page={{add .Data.Filter.Page 1}}">Next</a>{{end}}
+</nav>
+{{else}}
+<p class="empty" id="payouts-empty">No payouts match these filters.</p>
+{{end}}
+{{end}}

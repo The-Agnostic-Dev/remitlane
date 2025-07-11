@@ -1,0 +1,15 @@
+{{define "content"}}
+<section class="login">
+  <h1>Remitlane Ops</h1>
+  <p class="muted">Remitlane staff only.</p>
+  {{with .Data.Error}}<div class="flash error">{{.}}</div>{{end}}
+  <form method="post" action="/login">
+    <input type="hidden" name="next" value="{{.Data.Next}}">
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" autocomplete="username" value="{{.Data.Email}}" required autofocus>
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button type="submit" class="primary">Sign in</button>
+  </form>
+</section>
+{{end}}

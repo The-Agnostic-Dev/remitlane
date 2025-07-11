@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{if .Title}}{{.Title}} · {{end}}Remitlane Ops</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body class="page-{{.Section}}">
+{{if .User.Email}}
+<header class="topbar">
+  <a class="brand" href="/ops">Remitlane <span>Ops</span></a>
+  <nav>
+    <a href="/ops/payouts" {{if or (eq .Section "payouts") (eq .Section "payout")}}class="active"{{end}}>Payouts</a>
+    <a href="/ops/partners" {{if or (eq .Section "partners") (eq .Section "partner")}}class="active"{{end}}>Partners</a>
+  </nav>
+  <div class="who">
+    <span title="{{.User.Email}}">{{.User.Name}} · {{.User.Role}}</span>
+    <form method="post" action="/logout"><button class="link">Sign out</button></form>
+  </div>
+</header>
+{{end}}
+{{if ne .Env "production"}}<div class="envbar">{{.Env}} environment · sandbox providers · business day {{date .Today}} (Africa/Lagos)</div>{{end}}
+<main>
+  {{with .Flash}}<div class="flash {{.Kind}}" role="status">{{.Text}}</div>{{end}}
+  {{template "content" .}}
+</main>
+</body>
+</html>
