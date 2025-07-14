@@ -51,6 +51,8 @@ func (c Currency) Exponent() int {
 	return 2
 }
 
+// Name is the currency's English name.
+func (c Currency) Name() string { return currencies[c].name }
 
 // Country is the ISO country code where the currency is paid out.
 func (c Currency) Country() string { return currencies[c].country }
