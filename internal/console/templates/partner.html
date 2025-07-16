@@ -1,0 +1,39 @@
+{{define "content"}}
+{{$p := .Data.Partner}}
+<p class="crumbs"><a href="/ops/partners">Partners</a> / {{$p.Name}}</p>
+<h1>{{$p.Name}}</h1>
+<div class="cols">
+  <section class="card">
+    <h2>Balances</h2>
+    <table class="grid compact">
+      <thead><tr><th>Currency</th><th class="num">Available</th><th class="num">Held</th></tr></thead>
+      <tbody>{{range .Data.Balances}}<tr><td>{{.Currency}}</td><td class="num">{{money .Available (print .Currency)}}</td><td class="num">{{money .Held (print .Currency)}}</td></tr>{{end}}</tbody>
+    </table>
+    <p><a href="/ops/ledger?account=partner:{{$p.ID}}:available:USD">Ledger for available USD</a></p>
+  </section>
+  <section class="card">
+    <h2>Daily limit</h2>
+    <p>{{money .Data.Usage.UsedMinor "USD"}} used of {{money .Data.Usage.LimitMinor "USD"}} today.</p>
+  </section>
+</div>
+<div class="cols">
+  <section class="card">
+    <h2>API keys</h2>
+    <table class="grid compact">
+      <thead><tr><th>Key</th><th>Label</th><th>Environment</th><th>Last used</th></tr></thead>
+      <tbody>{{range .Data.Keys}}<tr><td class="mono">{{.Prefix}}…</td><td>{{.Label}}</td><td>{{.Environment}}</td><td>{{whenp .LastUsedAt}}</td></tr>{{end}}</tbody>
+    </table>
+  </section>
+  <section class="card">
+    <h2>Webhook endpoints</h2>
+    {{range .Data.Endpoints}}<p class="mono">{{.Url}}</p>{{else}}<p class="muted">No endpoint configured.</p>{{end}}
+    <p class="muted">Contact: {{$p.ContactEmail}}</p>
+  </section>
+</div>
+<h2>Recent payouts</h2>
+<table class="grid">
+  <thead><tr><th>Reference</th><th>Recipient</th><th class="num">Amount</th><th>Status</th><th>Created</th></tr></thead>
+  <tbody>{{range .Data.Recent}}<tr><td><a href="/ops/payouts/{{.ID}}">{{.Reference}}</a></td><td>{{.RecipientName}}</td><td class="num">{{money .DestAmountMinor .DestCurrency}}</td><td><span class="status {{.Status}}">{{.Status}}</span></td><td>{{when .CreatedAt}}</td></tr>{{end}}</tbody>
+</table>
+<p><a href="/ops/payouts?partner={{$p.ID}}">All payouts for {{$p.Name}}</a></p>
+{{end}}
