@@ -1,0 +1,57 @@
+{{define "content"}}
+{{$p := .Data.Payout}}
+<p class="crumbs"><a href="/ops/payouts">Payouts</a> / {{$p.Reference}}</p>
+<h1>{{$p.Reference}} <span class="status {{$p.Status}}">{{$p.Status}}</span></h1>
+<div class="cols">
+  <section class="card">
+    <h2>Payout</h2>
+    <dl class="facts">
+      <dt>Payout id</dt><dd class="mono">{{$p.ID}}</dd>
+      <dt>Partner</dt><dd><a href="/ops/partners/{{.Data.Partner.ID}}">{{.Data.Partner.Name}}</a></dd>
+      <dt>Recipient gets</dt><dd class="amount" id="dest-amount">{{amount $p.DestAmountMinor $p.DestCurrency}}</dd>
+      <dt>Partner pays</dt><dd>{{amount $p.SourceAmountMinor $p.SourceCurrency}} + fee {{amount $p.FeeMinor $p.SourceCurrency}}</dd>
+      <dt>Rate</dt><dd>{{$p.Rate}}</dd>
+      <dt>USD value</dt><dd>{{money $p.UsdAmountMinor "USD"}}</dd>
+      <dt>Created</dt><dd>{{when $p.CreatedAt}}</dd>
+      <dt>Completed</dt><dd>{{whenp $p.CompletedAt}}</dd>
+      {{if $p.BatchID.Valid}}<dt>Batch</dt><dd class="mono">{{$p.BatchID.String}}</dd>{{end}}
+      {{if $p.FailureCode}}<dt>Failure</dt><dd class="bad">{{$p.FailureCode}}: {{$p.FailureMessage}}</dd>{{end}}
+    </dl>
+  </section>
+  <section class="card">
+    <h2>Recipient</h2>
+    <dl class="facts">
+      <dt>Name</dt><dd>{{$p.RecipientName}}</dd>
+      <dt>Country</dt><dd>{{$p.RecipientCountry}}</dd>
+      {{if $p.Msisdn}}<dt>Mobile number</dt><dd class="mono">{{$p.Msisdn}}</dd>
+      {{else}}<dt>Bank code</dt><dd class="mono">{{$p.BankCode}}</dd><dt>Account</dt><dd class="mono">{{$p.AccountNumber}}</dd>{{end}}
+      <dt>Channel</dt><dd>{{label $p.Channel}} via {{provider $p.Provider}}</dd>
+      <dt>Provider ref</dt><dd class="mono">{{or $p.ProviderRef "not yet assigned"}}</dd>
+      {{if $p.Narration}}<dt>Narration</dt><dd>{{$p.Narration}}</dd>{{end}}
+    </dl>
+  </section>
+</div>
+
+<h2>Timeline</h2>
+<table class="grid">
+  <thead><tr><th>When</th><th>Status</th><th>Source</th><th>Detail</th></tr></thead>
+  <tbody>{{range .Data.Events}}<tr><td>{{when .CreatedAt}}</td><td><span class="status {{.Status}}">{{.Status}}</span></td><td>{{.Source}}</td><td>{{.Detail}}</td></tr>{{end}}</tbody>
+</table>
+
+<h2>Ledger</h2>
+<table class="grid">
+  <thead><tr><th>Txn</th><th>Kind</th><th>Account</th><th class="num">Amount</th><th>When</th></tr></thead>
+  <tbody>{{range .Data.Ledger}}<tr><td>#{{.ID}}</td><td>{{label .Kind}}</td><td class="mono">{{.Code}}</td><td class="num">{{.Amount}} {{.Currency}}</td><td>{{when .CreatedAt}}</td></tr>{{end}}</tbody>
+</table>
+
+<h2>Partner webhooks</h2>
+{{if .Data.Deliveries}}
+<table class="grid">
+  <thead><tr><th>Event</th><th>Status</th><th class="num">Attempts</th><th class="num">Last answer</th><th>Endpoint</th></tr></thead>
+  <tbody>{{range .Data.Deliveries}}<tr><td>{{.Type}}<div class="sub mono">{{.EventID}}</div></td><td>{{.Status}}</td><td class="num">{{.Attempts}}</td><td class="num">{{.LastStatusCode}}</td><td class="mono sub">{{.Url}}</td></tr>{{end}}</tbody>
+</table>
+{{else}}<p class="muted">No webhooks sent for this payout yet.</p>{{end}}
+{{end}}
+
+{{end}}
+{{end}}
