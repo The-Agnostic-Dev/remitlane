@@ -1,0 +1,13 @@
+{{template "head" "Outbox"}}
+<h1>Outbox</h1>
+<p class="muted">Email that would have been sent (MAIL_PROVIDER=outbox). Newest first.</p>
+<table class="grid" id="outbox">
+  <thead><tr><th>#</th><th>To</th><th>Subject</th><th>Sent</th></tr></thead>
+  <tbody>
+  {{range .}}
+  <tr data-message-id="{{.ID}}"><td>{{.ID}}</td><td>{{.Recipient}}</td>
+    <td><details><summary>{{.Subject}}</summary><pre>{{.Body}}</pre></details></td><td>{{when .CreatedAt}}</td></tr>
+  {{else}}<tr><td colspan="4" class="empty">No messages yet.</td></tr>{{end}}
+  </tbody>
+</table>
+{{template "foot"}}

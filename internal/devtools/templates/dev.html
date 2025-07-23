@@ -1,0 +1,6 @@
+{{define "head"}}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{.}} · Remitlane dev</title><link rel="stylesheet" href="/static/app.css"></head>
+<body><div class="envbar">Development tools: not available in production</div><main>
+<p class="crumbs"><a href="/ops">Console</a> · <a href="/_dev/outbox">Outbox</a> · <a href="/_dev/receiver">Webhook receiver</a> · <a href="/ops/sandbox">Provider sandbox</a></p>{{end}}
+{{define "foot"}}</main></body></html>{{end}}
