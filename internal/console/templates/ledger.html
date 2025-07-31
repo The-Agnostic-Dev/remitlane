@@ -1,0 +1,29 @@
+{{define "content"}}
+<h1>Ledger</h1>
+<form method="get" class="filters">
+  <label>Account code <input name="account" value="{{.Data.Account}}" placeholder="partner:prt_kobopay:available:USD" size="40"></label>
+  <button type="submit">Show</button>
+  {{if .Data.Account}}<a href="/ops/ledger" class="muted">All accounts</a>{{end}}
+</form>
+<p class="muted">Newest 50 transactions. Every transaction's legs sum to zero; amounts are major units with four decimals.</p>
+<table class="grid ledger">
+  <thead><tr><th>Txn</th><th>Kind</th><th>Payout</th><th>Account</th><th class="num">Amount</th><th>When</th></tr></thead>
+  <tbody>
+  {{range .Data.Txns}}
+    {{$t := .}}
+    {{range $i, $e := .Entries}}
+    <tr {{if eq $i 0}}class="txn-start"{{end}}>
+      <td>{{if eq $i 0}}#{{$t.ID}}{{end}}</td>
+      <td>{{if eq $i 0}}{{label $t.Kind}}{{end}}</td>
+      <td>{{if and (eq $i 0) $t.PayoutID}}<a href="/ops/payouts/{{$t.PayoutID}}" class="mono">{{$t.PayoutID}}</a>{{end}}</td>
+      <td class="mono" title="{{$e.Account}}"><a href="/ops/ledger?account={{$e.Account}}">{{account $e.Account}}</a></td>
+      <td class="num">{{$e.Amount}} {{$e.Currency}}</td>
+      <td>{{if eq $i 0}}{{when $t.CreatedAt}}{{end}}</td>
+    </tr>
+    {{end}}
+  {{else}}
+    <tr><td colspan="6" class="empty">No transactions.</td></tr>
+  {{end}}
+  </tbody>
+</table>
+{{end}}

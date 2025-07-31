@@ -14,6 +14,8 @@
   <nav>
     <a href="/ops/payouts" {{if or (eq .Section "payouts") (eq .Section "payout")}}class="active"{{end}}>Payouts</a>
     <a href="/ops/partners" {{if or (eq .Section "partners") (eq .Section "partner")}}class="active"{{end}}>Partners</a>
+    <a href="/ops/ledger" {{if eq .Section "ledger"}}class="active"{{end}}>Ledger</a>
+    <a href="/ops/webhooks/failed" {{if eq .Section "webhooks"}}class="active"{{end}}>Failed webhooks</a>
   </nav>
   <div class="who">
     <span title="{{.User.Email}}">{{.User.Name}} · {{.User.Role}}</span>
