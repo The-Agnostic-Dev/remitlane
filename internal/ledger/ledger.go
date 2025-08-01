@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -119,6 +120,15 @@ func LockedBalance(ctx context.Context, tx pgx.Tx, a Account) (int64, error) {
 	return money.DecimalToMinor(sum, a.Currency)
 }
 
+// ShortCode trims an account code for display ("partner:prt_x:available:USD"
+// becomes "available USD").
+func ShortCode(code string) string {
+	parts := strings.Split(code, ":")
+	if len(parts) == 4 {
+		return parts[2] + " " + parts[3]
+	}
+	return code
+}
 
 func text(s string) pgtype.Text {
 	return pgtype.Text{String: s, Valid: s != ""}

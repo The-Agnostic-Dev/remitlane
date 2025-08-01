@@ -40,3 +40,11 @@ func TestHoldThenReleaseRestoresAvailable(t *testing.T) {
 	}
 }
 
+func TestShortCode(t *testing.T) {
+	if got := ShortCode("partner:prt_kobopay:available:USD"); got != "available USD" {
+		t.Errorf("got %q", got)
+	}
+	if got := ShortCode("revenue:fees:USD"); got != "revenue:fees:USD" {
+		t.Errorf("got %q", got)
+	}
+}
