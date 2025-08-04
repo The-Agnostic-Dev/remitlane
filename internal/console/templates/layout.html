@@ -12,10 +12,13 @@
 <header class="topbar">
   <a class="brand" href="/ops">Remitlane <span>Ops</span></a>
   <nav>
+    <a href="/ops" {{if eq .Section "dashboard"}}class="active"{{end}}>Dashboard</a>
     <a href="/ops/payouts" {{if or (eq .Section "payouts") (eq .Section "payout")}}class="active"{{end}}>Payouts</a>
     <a href="/ops/partners" {{if or (eq .Section "partners") (eq .Section "partner")}}class="active"{{end}}>Partners</a>
+    <a href="/ops/limits" {{if eq .Section "limits"}}class="active"{{end}}>Limits</a>
     <a href="/ops/ledger" {{if eq .Section "ledger"}}class="active"{{end}}>Ledger</a>
     <a href="/ops/webhooks/failed" {{if eq .Section "webhooks"}}class="active"{{end}}>Failed webhooks</a>
+    <a href="/ops/reconciliation" {{if eq .Section "recon"}}class="active"{{end}}>Reconciliation</a>
   </nav>
   <div class="who">
     <span title="{{.User.Email}}">{{.User.Name}} · {{.User.Role}}</span>

@@ -1,0 +1,49 @@
+{{define "content"}}
+{{$r := .Data.Report}}
+<h1>Reconciliation</h1>
+<form method="get" class="filters">
+  <label>Business date <input type="date" name="date" value="{{.Data.Date}}" max="{{.Today}}"></label>
+  <button type="submit">Show</button>
+  <a class="button" href="/ops/reconciliation.csv?date={{.Data.Date}}" id="recon-csv">Download CSV</a>
+</form>
+<p class="muted">Payouts created on {{date .Data.Date}}, midnight to midnight Lagos time. Failed payouts are listed but left out of the totals. The nightly run at 01:00 WAT emails finance the report for the previous day.</p>
+
+<div class="tiles">
+  <div class="tile"><span class="big">{{len $r.Rows}}</span> payouts</div>
+  <div class="tile ok"><span class="big">{{index $r.ByStatus "completed"}}</span> completed</div>
+  <div class="tile bad"><span class="big">{{index $r.ByStatus "failed"}}</span> failed</div>
+  <div class="tile"><span class="big">{{money $r.USDMinor "USD"}}</span> USD value</div>
+</div>
+
+<h2>By currency</h2>
+<table class="grid" id="recon-totals">
+  <thead><tr><th>Currency</th><th class="num">Payouts</th><th class="num">Completed</th><th class="num">Paid out</th><th class="num">USD value</th><th class="num">Fees (USD)</th></tr></thead>
+  <tbody>
+  {{range $r.Totals}}
+    <tr data-currency="{{.Currency}}"><td>{{.Currency}}</td><td class="num">{{.Count}}</td><td class="num">{{.Completed}}</td>
+      <td class="num">{{money .DestMinor (print .Currency)}}</td><td class="num">{{money .USDMinor "USD"}}</td><td class="num">{{money .FeeUSDMinor "USD"}}</td></tr>
+  {{else}}
+    <tr><td colspan="6" class="empty">No payouts on this date.</td></tr>
+  {{end}}
+  </tbody>
+</table>
+
+<h2>Payouts</h2>
+{{if gt (len $r.Rows) .Data.Shown}}<p class="muted">Showing the first {{.Data.Shown}}; download the CSV for all {{len $r.Rows}}.</p>{{end}}
+<table class="grid" id="recon-rows">
+  <thead><tr><th>Payout</th><th>Partner</th><th>Provider ref</th><th>Status</th><th class="num">Amount</th><th>Created</th></tr></thead>
+  <tbody>
+  {{range $i, $row := $r.Rows}}{{if lt $i $.Data.Shown}}
+    <tr data-payout-id="{{$row.PayoutID}}"><td><a href="/ops/payouts/{{$row.PayoutID}}">{{$row.Reference}}</a></td><td>{{$row.PartnerName}}</td>
+      <td class="mono">{{$row.ProviderRef}}</td><td><span class="status {{$row.Status}}">{{$row.Status}}</span></td>
+      <td class="num">{{money $row.DestMinor $row.DestCurrency}}</td><td>{{when $row.CreatedAt}}</td></tr>
+  {{end}}{{end}}
+  </tbody>
+</table>
+
+<h2>Recent runs</h2>
+<table class="grid compact">
+  <thead><tr><th>Date</th><th class="num">Payouts</th><th class="num">USD value</th><th>Triggered by</th><th>Ran</th></tr></thead>
+  <tbody>{{range .Data.Runs}}<tr><td>{{.BusinessDate.Time.Format "2006-01-02"}}</td><td class="num">{{.PayoutCount}}</td><td class="num">{{money .UsdTotalMinor "USD"}}</td><td>{{.TriggeredBy}}</td><td>{{when .CreatedAt}}</td></tr>{{else}}<tr><td colspan="5" class="empty">No runs yet.</td></tr>{{end}}</tbody>
+</table>
+{{end}}

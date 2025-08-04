@@ -1,0 +1,19 @@
+{{define "content"}}
+<h1>Daily limits</h1>
+<p class="muted">Daily payout limits per partner, in USD.</p>
+<table class="grid" id="limits">
+  <thead><tr><th>Partner</th><th class="num">Limit</th><th class="num">Used today</th><th class="num">Remaining</th><th>Usage</th><th>Window</th></tr></thead>
+  <tbody>
+  {{range .Data}}
+    <tr data-partner="{{.Partner.Slug}}" data-used="{{.Usage.UsedMinor}}">
+      <td><a href="/ops/partners/{{.Partner.ID}}">{{.Partner.Name}}</a></td>
+      <td class="num">{{money .Usage.LimitMinor "USD"}}</td>
+      <td class="num">{{money .Usage.UsedMinor "USD"}}</td>
+      <td class="num">{{money .Usage.RemainingMinor "USD"}}</td>
+      <td><div class="bar"><span style="width: {{.Percent}}%"></span></div> {{.Percent}}%</td>
+      <td class="window">{{when .Usage.WindowStart}} to {{when .Usage.WindowEnd}}</td>
+    </tr>
+  {{end}}
+  </tbody>
+</table>
+{{end}}

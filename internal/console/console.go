@@ -76,6 +76,7 @@ func (c *Console) Routes(r chi.Router) {
 
 	r.Route("/ops", func(r chi.Router) {
 		r.Use(c.requireSession, c.checkCSRF)
+		r.Get("/", c.dashboard)
 		r.Get("/payouts", c.payouts)
 		r.Get("/payouts/{id}", c.payout)
 		r.Get("/partners", c.partners)
@@ -84,5 +85,9 @@ func (c *Console) Routes(r chi.Router) {
 		r.Get("/webhooks/failed", c.failedWebhooks)
 		r.Post("/webhooks/deliveries/{id}/retry", c.retryDelivery)
 		r.Post("/webhooks/endpoints/{id}/retry", c.retryEndpoint)
+		r.Get("/limits", c.limitsPage)
+		r.Get("/reconciliation", c.reconPage)
+		r.Get("/reconciliation.csv", c.reconCSV)
+		r.Post("/reconciliation/run", c.reconRun)
 	})
 }
