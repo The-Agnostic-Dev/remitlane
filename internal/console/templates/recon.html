@@ -6,6 +6,11 @@
   <button type="submit">Show</button>
   <a class="button" href="/ops/reconciliation.csv?date={{.Data.Date}}" id="recon-csv">Download CSV</a>
 </form>
+<form method="post" action="/ops/reconciliation/run" class="inline">
+  <input type="hidden" name="csrf" value="{{.User.CSRF}}">
+  <input type="hidden" name="date" value="{{.Data.Date}}">
+  <button type="submit">Run and email finance</button>
+</form>
 <p class="muted">Payouts created on {{date .Data.Date}}, midnight to midnight Lagos time. Failed payouts are listed but left out of the totals. The nightly run at 01:00 WAT emails finance the report for the previous day.</p>
 
 <div class="tiles">

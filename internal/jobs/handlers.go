@@ -11,10 +11,12 @@ import (
 
 	"github.com/remitlane/remitlane/internal/clock"
 	"github.com/remitlane/remitlane/internal/config"
+	"github.com/remitlane/remitlane/internal/notify"
 	"github.com/remitlane/remitlane/internal/outbound"
 	"github.com/remitlane/remitlane/internal/payouts"
 	"github.com/remitlane/remitlane/internal/queue"
 	"github.com/remitlane/remitlane/internal/rates"
+	"github.com/remitlane/remitlane/internal/recon"
 	"github.com/remitlane/remitlane/internal/store"
 )
 
@@ -23,6 +25,8 @@ type Handlers struct {
 	Store    *store.Store
 	Payouts  *payouts.Service
 	Webhooks *outbound.Service
+	Recon    *recon.Builder
+	Mail     notify.Sender
 	Feed     rates.Feed
 	Clock    *clock.Clock
 	Config   config.Config
@@ -35,6 +39,8 @@ func (h *Handlers) Mux() *asynq.ServeMux {
 	mux.HandleFunc(queue.TypeDispatch, h.dispatch)
 	mux.HandleFunc(queue.TypePoll, h.poll)
 	mux.HandleFunc(queue.TypeDeliver, h.deliver)
+	mux.HandleFunc(queue.TypeRecon, h.recon)
+	mux.HandleFunc(queue.TypeLowBalance, h.lowBalance)
 	return mux
 }
 
