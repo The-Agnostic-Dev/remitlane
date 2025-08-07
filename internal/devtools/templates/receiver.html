@@ -1,0 +1,24 @@
+{{template "head" "Webhook receiver"}}
+<h1>Webhook receiver</h1>
+<p class="muted">Seeded partners send their webhooks here (<code>/_dev/receiver/&lt;partner&gt;</code>). Every attempt is listed, newest first. JSON at <a href="/_dev/receiver.json">/_dev/receiver.json</a> (filters: <code>partner</code>, <code>payout</code>).</p>
+<h2>Answers</h2>
+<table class="grid compact">
+  <thead><tr><th>Partner</th><th>Answers with</th><th>Note</th><th>Change</th></tr></thead>
+  <tbody>
+  {{range .Config}}
+  <tr><td><a href="/_dev/receiver?partner={{.Slug}}">{{.Slug}}</a></td><td>HTTP {{.RespondWith}}</td><td>{{.Note}}</td>
+    <td><form method="post" action="/_dev/receiver/{{.Slug}}/config" class="inline"><input name="respond_with" size="4" value="{{.RespondWith}}"><input name="note" value="{{.Note}}" size="30"><button>Save</button></form></td></tr>
+  {{end}}
+  </tbody>
+</table>
+<h2>Received{{if .Slug}} by {{.Slug}}{{end}}</h2>
+<table class="grid compact" id="receiver-hits">
+  <thead><tr><th>#</th><th>Partner</th><th>Event</th><th>Payout</th><th>Answered</th><th>Received</th></tr></thead>
+  <tbody>
+  {{range .Hits}}
+  <tr data-event-id="{{.EventID}}"><td>{{.ID}}</td><td>{{.Slug}}</td><td>{{.EventType}}<div class="sub mono">{{.EventID}}</div></td>
+    <td class="mono"><a href="/ops/payouts/{{.PayoutID}}">{{.PayoutID}}</a></td><td>{{.Responded}}</td><td>{{when .ReceivedAt}}</td></tr>
+  {{else}}<tr><td colspan="6" class="empty">Nothing received yet.</td></tr>{{end}}
+  </tbody>
+</table>
+{{template "foot"}}
