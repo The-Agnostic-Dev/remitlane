@@ -21,6 +21,35 @@ type dashboardPage struct {
 	DayStart  time.Time
 }
 
+func (c *Console) dashboard(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	start, _ := c.clock.DayBounds(c.clock.Now())
+	data := dashboardPage{DayStart: start}
+	var err error
+	if data.Counts, err = c.store.StatusCounts(ctx, start); err != nil {
+		c.fail(w, r, err)
+		return
+	}
+	for _, n := range data.Counts {
+		data.Total += n
+	}
+	if data.Recent, err = c.store.RecentPayouts(ctx, 8); err != nil {
+		c.fail(w, r, err)
+		return
+	}
+	if data.Health, err = c.store.ProviderHealth(ctx, time.Now().Add(-24*time.Hour)); err != nil {
+		c.fail(w, r, err)
+		return
+	}
+	if data.Failed, err = c.store.CountFailedDeliveries(ctx); err != nil {
+		c.fail(w, r, err)
+		return
+	}
+	for _, n := range data.Failed {
+		data.FailedAll += n
+	}
+	c.renderTitled(w, r, "dashboard", "Dashboard", data)
+}
 
 type limitRow struct {
 	Partner db.Partner

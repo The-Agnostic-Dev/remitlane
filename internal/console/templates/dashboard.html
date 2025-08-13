@@ -1,0 +1,22 @@
+{{define "content"}}
+<h1>Dashboard</h1>
+<p class="muted">Since {{when .Data.DayStart}} (business day, Lagos time).</p>
+<div class="tiles">
+  <div class="tile"><span class="big">{{.Data.Total}}</span> payouts today</div>
+  <div class="tile ok"><span class="big">{{index .Data.Counts "completed"}}</span> completed</div>
+  <div class="tile warn"><span class="big">{{add (add (index .Data.Counts "pending") (index .Data.Counts "submitted")) (index .Data.Counts "processing")}}</span> in flight</div>
+  <div class="tile bad"><span class="big">{{index .Data.Counts "failed"}}</span> failed</div>
+  <a class="tile {{if .Data.FailedAll}}bad{{end}}" href="/ops/webhooks/failed"><span class="big">{{.Data.FailedAll}}</span> failed webhooks</a>
+</div>
+
+<h2>Latest payouts</h2>
+<table class="grid">
+  <thead><tr><th>Payout</th><th>Partner</th><th>Recipient</th><th class="num">Amount</th><th>Status</th><th>Created</th></tr></thead>
+  <tbody>
+  {{range .Data.Recent}}
+    <tr><td><a href="/ops/payouts/{{.ID}}">{{.Reference}}</a></td><td>{{.PartnerName}}</td><td>{{.RecipientName}}</td>
+      <td class="num">{{amount .DestAmountMinor .DestCurrency}}</td><td><span class="status {{.Status}}">{{.Status}}</span></td><td>{{ago .CreatedAt}}</td></tr>
+  {{end}}
+  </tbody>
+</table>
+{{end}}
