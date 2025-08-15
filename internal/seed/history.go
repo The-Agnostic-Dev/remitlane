@@ -78,6 +78,9 @@ func (g *generator) history(ctx context.Context, q *db.Queries, tx pgx.Tx) error
 	for d := 30; d >= 1; d-- {
 		day := today.AddDate(0, 0, -d)
 		n := 4 + g.rnd.IntN(4)
+		if wd := day.Weekday(); wd == time.Saturday || wd == time.Sunday {
+			n = 1 + g.rnd.IntN(2)
+		}
 		for range n {
 			at := day.Add(7*time.Hour + time.Duration(g.rnd.IntN(13*3600))*time.Second)
 			if _, err := g.insert(ctx, q, tx, g.random(at, g.randomStatus())); err != nil {
