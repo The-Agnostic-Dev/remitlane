@@ -57,6 +57,6 @@ func (h *Handlers) recon(ctx context.Context, t *asynq.Task) error {
 		return err
 	}
 	return h.Mail.Send(ctx, notify.Message{
-		To: h.Config.Mail.ReconTo, Subject: "Reconciliation report", Body: body,
+		To: h.Config.Mail.ReconTo, Subject: "Reconciliation ready: " + clock.DisplayDate(date), Body: body,
 	})
 }
