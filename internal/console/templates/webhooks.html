@@ -1,0 +1,37 @@
+{{define "content"}}
+<h1>Failed webhooks</h1>
+<p class="muted">Partner webhooks that used up their automatic attempts. Retry sends the event once more with a fresh signature; fix the partner's endpoint first or it will land back here.</p>
+<form method="get" class="filters">
+  <label>Partner
+    <select name="partner" data-autosubmit>
+      <option value="">All partners</option>
+      {{$sel := .Data.PartnerID}}
+      {{range .Data.Partners}}<option value="{{.ID}}" {{if eq .ID $sel}}selected{{end}}>{{.Name}}</option>{{end}}
+    </select>
+  </label>
+</form>
+<table class="grid" id="failed-webhooks">
+  <thead><tr><th>Delivery</th><th>Partner</th><th>Event</th><th>Payout</th><th class="num">Attempts</th><th>Last answer</th><th>Last try</th><th></th></tr></thead>
+  <tbody>
+  {{range .Data.Rows}}
+    <tr data-delivery-id="{{.ID}}" data-attempts="{{.Attempts}}" data-partner="{{.PartnerID}}">
+      <td class="mono">#{{.ID}}</td>
+      <td>{{.PartnerName}}<div class="sub mono">{{.URL}}</div></td>
+      <td>{{.EventType}}<div class="sub mono">{{.EventID}}</div></td>
+      <td>{{if .PayoutID}}<a class="mono" href="/ops/payouts/{{.PayoutID}}">{{.PayoutID}}</a>{{end}}</td>
+      <td class="num">{{.Attempts}}</td>
+      <td>{{if .LastStatus}}HTTP {{.LastStatus}}{{else}}no answer{{end}}<div class="sub">{{.LastError}}</div></td>
+      <td>{{ago .LastAttemptAt}}</td>
+      <td>
+        <form method="post" action="/ops/webhooks/deliveries/{{.ID}}/retry">
+          <input type="hidden" name="csrf" value="{{$.User.CSRF}}">
+          <button type="submit" class="small">Retry</button>
+        </form>
+      </td>
+    </tr>
+  {{else}}
+    <tr><td colspan="8" class="empty">Nothing in the failed queue.</td></tr>
+  {{end}}
+  </tbody>
+</table>
+{{end}}
