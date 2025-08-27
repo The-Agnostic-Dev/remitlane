@@ -9,6 +9,13 @@
     })
   })
 
+  // Forms that do something to many records ask first.
+  document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+    form.addEventListener('submit', function (ev) {
+      if (!window.confirm(form.dataset.confirm)) ev.preventDefault()
+    })
+  })
+
   // Flash messages fade after a while.
   var flash = document.querySelector('.flash.ok')
   if (flash) {

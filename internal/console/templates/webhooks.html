@@ -10,6 +10,16 @@
     </select>
   </label>
 </form>
+{{if .Data.Endpoints}}
+<div class="bulk-actions">
+  {{range $id, $name := .Data.Endpoints}}
+  <form method="post" action="/ops/webhooks/endpoints/{{$id}}/retry" data-confirm="Retry every failed webhook for {{$name}}?">
+    <input type="hidden" name="csrf" value="{{$.User.CSRF}}">
+    <button type="submit">Retry all for {{$name}}</button>
+  </form>
+  {{end}}
+</div>
+{{end}}
 <table class="grid" id="failed-webhooks">
   <thead><tr><th>Delivery</th><th>Partner</th><th>Event</th><th>Payout</th><th class="num">Attempts</th><th>Last answer</th><th>Last try</th><th></th></tr></thead>
   <tbody>
