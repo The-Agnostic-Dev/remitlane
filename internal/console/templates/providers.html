@@ -1,0 +1,23 @@
+{{define "content"}}
+<h1>Providers</h1>
+<p class="muted">Last 24 hours. Inbound webhooks are recorded before they are acted on, so signature failures show up here.</p>
+<div class="cols">
+{{range .Data.Health}}
+  <section class="card" data-provider="{{.Provider}}">
+    <h2>{{provider .Provider}}</h2>
+    <dl class="facts">
+      <dt>Payouts</dt><dd>{{.Total}}</dd>
+      <dt>Completed</dt><dd>{{.Completed}} ({{pct .Completed .Total}})</dd>
+      <dt>Failed</dt><dd>{{.Failed}}</dd>
+      <dt>In flight</dt><dd>{{.InFlight}}</dd>
+      <dt>Average time to complete</dt><dd>{{seconds .AvgSeconds}}</dd>
+      <dt>Webhooks received</dt><dd>{{.Webhooks}}</dd>
+      <dt>Bad signatures</dt><dd class="{{if .BadSignatures}}bad{{end}}" data-bad-signatures="{{.BadSignatures}}">{{.BadSignatures}}</dd>
+      <dt>Last webhook</dt><dd>{{if .LastWebhookAt}}{{ago .LastWebhookAt}}{{else}}never{{end}}</dd>
+    </dl>
+  </section>
+{{end}}
+</div>
+{{end}}
+{{end}}
+{{end}}

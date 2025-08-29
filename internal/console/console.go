@@ -89,5 +89,8 @@ func (c *Console) Routes(r chi.Router) {
 		r.Get("/reconciliation", c.reconPage)
 		r.Get("/reconciliation.csv", c.reconCSV)
 		r.Post("/reconciliation/run", c.reconRun)
+		r.Get("/providers", c.providersPage)
+		r.Get("/sandbox", c.sandboxPage)
+		r.Post("/sandbox/force", c.sandboxForce)
 	})
 }

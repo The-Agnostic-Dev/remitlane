@@ -9,6 +9,17 @@
   <a class="tile {{if .Data.FailedAll}}bad{{end}}" href="/ops/webhooks/failed"><span class="big">{{.Data.FailedAll}}</span> failed webhooks</a>
 </div>
 
+<h2>Providers, last 24 hours</h2>
+<table class="grid">
+  <thead><tr><th>Provider</th><th class="num">Payouts</th><th class="num">Success</th><th class="num">In flight</th><th class="num">Avg time</th><th class="num">Bad signatures</th></tr></thead>
+  <tbody>
+  {{range .Data.Health}}
+    <tr><td><a href="/ops/providers">{{provider .Provider}}</a></td><td class="num">{{.Total}}</td><td class="num">{{pct .Completed .Total}}</td>
+      <td class="num">{{.InFlight}}</td><td class="num">{{seconds .AvgSeconds}}</td><td class="num {{if .BadSignatures}}bad{{end}}">{{.BadSignatures}}</td></tr>
+  {{end}}
+  </tbody>
+</table>
+
 <h2>Latest payouts</h2>
 <table class="grid">
   <thead><tr><th>Payout</th><th>Partner</th><th>Recipient</th><th class="num">Amount</th><th>Status</th><th>Created</th></tr></thead>

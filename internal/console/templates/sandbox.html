@@ -1,0 +1,34 @@
+{{define "content"}}
+<h1>Provider sandbox</h1>
+{{if not .Data.Enabled}}
+<p>Providers are running in live mode; there is no sandbox to control.</p>
+{{else}}
+<p class="muted">Both providers are local fakes (SWIFTPAY_MODE=sandbox, MOMOBRIDGE_MODE=sandbox). Recipient details pick the outcome, see docs/sandbox.md. You can also force the next payout's outcome here.</p>
+<div class="cols">
+  <section class="card">
+    <h2>Swiftpay (bank)</h2>
+    <ul class="hints">
+      <li>Account ending <code>0001</code>: fails (INVALID_ACCOUNT)</li>
+      <li>Account ending <code>0099</code>: compliance hold, then completes</li>
+      <li>Account ending <code>0077</code>: completes, then the bank reverses it</li>
+      <li>Account ending <code>0055</code>: completes without a webhook (the poller picks it up)</li>
+      <li>NGN amounts of ₦1,000,000 or more: queued for manual review, completes later</li>
+    </ul>
+    <form method="post" action="/ops/sandbox/force" class="inline">
+      <input type="hidden" name="csrf" value="{{.User.CSRF}}">
+      <input type="hidden" name="provider" value="swiftpay">
+      <select name="scenario"><option value="">Normal rules</option>{{range .Data.SwiftpayScenarios}}<option {{if eq . $.Data.SwiftpayForced}}selected{{end}}>{{.}}</option>{{end}}</select>
+      <button type="submit">Set next outcome</button>
+    </form>
+  </section>
+</div>
+<h2>Swiftpay transfers</h2>
+<table class="grid compact" id="swiftpay-transfers">
+  <thead><tr><th>Transfer</th><th>Reference</th><th class="num">Amount</th><th>Status</th><th>Scenario</th><th>Webhooks sent</th></tr></thead>
+  <tbody>{{range .Data.Transfers}}<tr data-reference="{{.Reference}}"><td class="mono">{{.ID}}</td><td class="mono"><a href="/ops/payouts/{{.Reference}}">{{.Reference}}</a></td><td class="num">{{.Currency}} {{.Amount}}</td><td>{{.Status}}</td><td>{{.Scenario}}</td>
+    <td>{{range .Callbacks}}<span class="pill">{{.Status}} {{.Code}}</span> {{end}}</td></tr>{{else}}<tr><td colspan="6" class="empty">No transfers since the app started.</td></tr>{{end}}</tbody>
+</table>
+{{end}}
+{{end}}
+{{end}}
+{{end}}

@@ -19,8 +19,11 @@
     <a href="/ops/ledger" {{if eq .Section "ledger"}}class="active"{{end}}>Ledger</a>
     <a href="/ops/webhooks/failed" {{if eq .Section "webhooks"}}class="active"{{end}}>Failed webhooks</a>
     <a href="/ops/reconciliation" {{if eq .Section "recon"}}class="active"{{end}}>Reconciliation</a>
+    <a href="/ops/providers" {{if eq .Section "providers"}}class="active"{{end}}>Providers</a>
+    {{if .DevTools}}<a href="/ops/sandbox" {{if eq .Section "sandbox"}}class="active"{{end}}>Sandbox</a>{{end}}
   </nav>
   <div class="who">
+    {{if .DevTools}}<a class="dev" href="/_dev/outbox">Outbox</a> <a class="dev" href="/_dev/receiver">Receiver</a>{{end}}
     <span title="{{.User.Email}}">{{.User.Name}} · {{.User.Role}}</span>
     <form method="post" action="/logout"><button class="link">Sign out</button></form>
   </div>
