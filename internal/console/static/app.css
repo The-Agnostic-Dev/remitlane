@@ -43,6 +43,12 @@ main { max-width: 1280px; margin: 0 auto; padding: 20px 24px 60px; }
 .facts dt { color: var(--muted); }
 .facts dd { margin: 0; }
 
+.tiles { display: flex; gap: 12px; flex-wrap: wrap; margin: 8px 0 16px; }
+.tile { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; min-width: 150px; color: var(--muted); }
+.tile .big { display: block; font-size: 24px; font-weight: 700; color: var(--ink); }
+.tile.ok .big { color: var(--ok); }
+.tile.warn .big { color: var(--warn); }
+.tile.bad .big { color: var(--bad); }
 
 table.grid { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 table.grid th, table.grid td { padding: 8px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
@@ -85,3 +91,8 @@ button:disabled { opacity: .6; cursor: wait; }
 .login label { font-size: 12px; color: var(--muted); }
 .login button { margin-top: 8px; }
 
+@media (max-width: 720px) {
+  .topbar { flex-wrap: wrap; height: auto; padding: 8px 12px; }
+  main { padding: 12px; }
+  .facts { grid-template-columns: 1fr; }
+}
