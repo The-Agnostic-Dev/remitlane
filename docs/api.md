@@ -158,6 +158,30 @@ recipient's bank returns the funds (amount and fee are refunded). Failed payouts
 { "object": "list", "data": [ ... ], "has_more": true, "next_cursor": "MjAyNi0xMS0wNlQwOToxNToyMC4xMjM0NTZa" }
 ```
 
+## Bulk payouts
+
+`POST /payouts/bulk` books up to 500 payouts in one request. Items are priced by **destination amount** at the
+current rate (no quote needed). Either every item is accepted or none is; errors name the failing `item` (1-based).
+
+```json
+{
+  "reference": "SETTLE-2026-11-06",
+  "items": [
+    {
+      "reference": "SETTLE-2026-11-06-01",
+      "source_currency": "USD",
+      "destination_currency": "GHS",
+      "channel": "bank",
+      "amount_minor": 125000,
+      "recipient": { "name": "Kwame Boateng", "country": "GH", "bank_code": "130100", "account_number": "1441002233019" }
+    }
+  ]
+}
+```
+
+Response `201`: `{"id": "bat_...", "object": "batch", "reference", "item_count", "created_at", "payouts": [...]}`.
+`GET /batches/{id}` returns it again.
+
 ## Balances and limits
 
 `GET /balances`
