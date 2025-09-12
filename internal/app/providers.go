@@ -38,10 +38,8 @@ func buildProviders(cfg config.Config, log *slog.Logger) providerSet {
 			CallbackURL: cfg.BaseURL + "/webhooks/momobridge", Delay: cfg.MoMo.SandboxDelay,
 		}, log)
 	}
-	sp := swiftpay.New(cfg.Swiftpay.BaseURL, cfg.Swiftpay.APIKey, newClient(cfg.Swiftpay.Timeout))
 	ps.registry = providers.Registry{
-		// Bank payouts fail over to the secondary Swiftpay region (RL ops request).
-		providers.Swiftpay: &providers.Failover{Primary: sp, Secondary: swiftpay.New(cfg.Swiftpay.BaseURL+"/dr", cfg.Swiftpay.APIKey, newClient(cfg.Swiftpay.Timeout)), Log: log},
+		providers.Swiftpay:   swiftpay.New(cfg.Swiftpay.BaseURL, cfg.Swiftpay.APIKey, newClient(cfg.Swiftpay.Timeout)),
 		providers.MoMoBridge: momobridge.New(cfg.MoMo.BaseURL, cfg.MoMo.APIKey, newClient(cfg.MoMo.Timeout)),
 	}
 	return ps
