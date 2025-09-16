@@ -1,7 +1,7 @@
 {{define "content"}}
 <section class="login">
   <h1>Remitlane Ops</h1>
-  <p class="muted">Remitlane staff only.</p>
+  <p class="muted">Sign in with your Remitlane email.</p>
   {{with .Data.Error}}<div class="flash error">{{.}}</div>{{end}}
   <form method="post" action="/login">
     <input type="hidden" name="next" value="{{.Data.Next}}">
