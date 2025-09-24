@@ -2,7 +2,7 @@
 DATABASE_URL ?= postgres://postgres@localhost:55421/remitlane?sslmode=disable
 TEST_DATABASE_URL ?= postgres://postgres@localhost:55421/remitlane_test?sslmode=disable
 
-.PHONY: run build test lint sqlc migrate seed
+.PHONY: run build test test-db lint sqlc migrate seed
 
 run:
 	go run ./cmd/remitlane
@@ -12,6 +12,10 @@ build:
 
 test:
 	go test ./...
+
+# Runs the store and payout tests against a throwaway database.
+test-db:
+	DATABASE_URL=$(TEST_DATABASE_URL) go test -p 1 ./...
 
 lint:
 	golangci-lint run ./...
