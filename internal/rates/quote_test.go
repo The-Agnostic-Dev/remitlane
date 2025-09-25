@@ -39,6 +39,21 @@ func TestQuoteBySourceNGN(t *testing.T) {
 	}
 }
 
+func TestKESMobileWholeShillings(t *testing.T) {
+	q := testQuoter(t)
+	ctx := context.Background()
+	p, err := q.Calculate(ctx, Request{From: money.USD, To: money.KES, Channel: MobileMoney, AmountMinor: 2500, AmountType: BySource})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if p.DestMinor%100 != 0 {
+		t.Errorf("M-Pesa payout of %d cents is not whole shillings", p.DestMinor)
+	}
+	if _, err := q.Calculate(ctx, Request{From: money.USD, To: money.KES, Channel: MobileMoney, AmountMinor: 150050, AmountType: ByDestination}); !errors.Is(err, ErrBadAmount) {
+		t.Errorf("KES 1,500.50 by M-Pesa accepted: %v", err)
+	}
+}
+
 func TestQuoteByDestinationRoundsSourceUp(t *testing.T) {
 	q := testQuoter(t)
 	p, err := q.Calculate(context.Background(), Request{From: money.USD, To: money.UGX, Channel: Bank, AmountMinor: 1850000, AmountType: ByDestination})
