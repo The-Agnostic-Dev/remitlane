@@ -99,8 +99,18 @@ func (g *generator) history(ctx context.Context, q *db.Queries, tx pgx.Tx) error
 		return err
 	}
 
-	return nil
-}
+	// Uganda payouts for Duka's sellers in Kampala.
+	ugBank, ugMobile := mixes["prt_dukamarket"][3], mixes["prt_dukamarket"][2]
+	for i, s := range []spec{
+		{partner: duka, mix: ugBank, destMajor: 1850000, at: today.AddDate(0, 0, -3).Add(11 * time.Hour), status: domain.Completed},
+		{partner: duka, mix: ugMobile, destMajor: 250000, at: today.AddDate(0, 0, -2).Add(15 * time.Hour), status: domain.Completed},
+		{partner: duka, mix: ugMobile, destMajor: 75000, at: today.AddDate(0, 0, -1).Add(9 * time.Hour), status: domain.Failed},
+	} {
+		s.ref = fmt.Sprintf("DM-UG-%04d", 311+i)
+		if _, err := g.insert(ctx, q, tx, s); err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
