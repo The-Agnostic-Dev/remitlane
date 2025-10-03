@@ -1,4 +1,17 @@
+# Binaries and build output
+/bin/
+/tmp/
 /remitlane
-.env
+*.exe
 *.test
+
+# Local config
+.env
+.env.local
+
+# Tooling
+coverage.out
+coverage.html
+.idea/
+.vscode/
 .DS_Store

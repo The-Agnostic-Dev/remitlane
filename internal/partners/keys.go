@@ -32,3 +32,5 @@ func NewKey(env string) string {
 	return "rl_" + env + "_" + hex.EncodeToString(b)
 }
 
+// Mask renders a key prefix for the console: "rl_sandbox_kobo…".
+func Mask(prefix string) string { return prefix + "…" }
