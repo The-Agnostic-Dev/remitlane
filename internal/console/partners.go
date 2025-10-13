@@ -92,3 +92,25 @@ func (c *Console) partner(w http.ResponseWriter, r *http.Request) {
 	c.renderTitled(w, r, "partner", p.Name, data)
 }
 
+func (c *Console) updateLimit(w http.ResponseWriter, r *http.Request) {
+	u := userFrom(r.Context())
+	id := chi.URLParam(r, "id")
+	if u.Role != "finance" && u.Role != "admin" {
+		setFlash(w, "error", "Only finance can change daily limits.")
+		http.Redirect(w, r, "/ops/partners/"+id, http.StatusSeeOther)
+		return
+	}
+	minor, err := money.DecimalToMinor(strings.ReplaceAll(r.FormValue("limit_usd"), ",", ""), money.USD)
+	if err != nil || minor <= 0 {
+		setFlash(w, "error", "Enter the new limit in US dollars, for example 25000.")
+		http.Redirect(w, r, "/ops/partners/"+id, http.StatusSeeOther)
+		return
+	}
+	if err := c.store.Q.UpdatePartnerLimit(r.Context(), db.UpdatePartnerLimitParams{ID: id, DailyLimitUsdMinor: minor}); err != nil {
+		c.fail(w, r, err)
+		return
+	}
+	c.log.Info("daily limit changed", "partner_id", id, "by", u.Email, "limit_minor", minor)
+	setFlash(w, "ok", "Daily limit set to "+money.Format(minor, money.USD)+".")
+	http.Redirect(w, r, "/ops/partners/"+id, http.StatusSeeOther)
+}

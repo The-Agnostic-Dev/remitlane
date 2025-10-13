@@ -81,6 +81,7 @@ func (c *Console) Routes(r chi.Router) {
 		r.Get("/payouts/{id}", c.payout)
 		r.Get("/partners", c.partners)
 		r.Get("/partners/{id}", c.partner)
+		r.Post("/partners/{id}/limit", c.updateLimit)
 		r.Get("/ledger", c.ledger)
 		r.Get("/webhooks/failed", c.failedWebhooks)
 		r.Post("/webhooks/deliveries/{id}/retry", c.retryDelivery)

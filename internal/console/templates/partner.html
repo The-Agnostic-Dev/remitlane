@@ -14,6 +14,12 @@
   <section class="card">
     <h2>Daily limit</h2>
     <p>{{money .Data.Usage.UsedMinor "USD"}} used of {{money .Data.Usage.LimitMinor "USD"}} today.</p>
+    <form method="post" action="/ops/partners/{{$p.ID}}/limit" class="inline">
+      <input type="hidden" name="csrf" value="{{.User.CSRF}}">
+      <label>New limit (USD) <input name="limit_usd" inputmode="decimal" placeholder="25000"></label>
+      <button type="submit">Save</button>
+    </form>
+    <p class="muted">Only finance can change limits.</p>
   </section>
 </div>
 <div class="cols">
