@@ -10,7 +10,7 @@ import (
 
 	"github.com/remitlane/remitlane/internal/clock"
 	"github.com/remitlane/remitlane/internal/db"
-	"github.com/remitlane/remitlane/internal/notify"
+	"github.com/remitlane/remitlane/internal/mail"
 	"github.com/remitlane/remitlane/internal/money"
 	"github.com/remitlane/remitlane/internal/queue"
 )
@@ -52,11 +52,11 @@ func (h *Handlers) recon(ctx context.Context, t *asynq.Task) error {
 			Amount: money.Format(tot.DestMinor, tot.Currency), Fees: money.Format(tot.FeeUSDMinor, money.USD),
 		})
 	}
-	body, err := notify.Render("recon", data)
+	body, err := mail.Render("recon", data)
 	if err != nil {
 		return err
 	}
-	return h.Mail.Send(ctx, notify.Message{
+	return h.Mail.Send(ctx, mail.Message{
 		To: h.Config.Mail.ReconTo, Subject: "Reconciliation ready: " + clock.DisplayDate(date), Body: body,
 	})
 }

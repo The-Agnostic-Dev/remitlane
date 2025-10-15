@@ -20,7 +20,7 @@ import (
 	"github.com/remitlane/remitlane/internal/inbound"
 	"github.com/remitlane/remitlane/internal/jobs"
 	"github.com/remitlane/remitlane/internal/limits"
-	"github.com/remitlane/remitlane/internal/notify"
+	"github.com/remitlane/remitlane/internal/mail"
 	"github.com/remitlane/remitlane/internal/migrate"
 	"github.com/remitlane/remitlane/internal/outbound"
 	"github.com/remitlane/remitlane/internal/payouts"
@@ -80,7 +80,7 @@ func New(ctx context.Context, cfg config.Config, log *slog.Logger) (*App, error)
 		Store: st, Quoter: quoter, Feed: feed, Limits: lim, Events: events, Queue: a.queue,
 		Providers: prov.registry, Clock: clk, Log: log, MaxBulk: cfg.MaxBulkItems,
 	})
-	mailer, err := notify.New(cfg.Mail.Provider, st.Q, log)
+	mailer, err := mail.New(cfg.Mail.Provider, st.Q, log)
 	if err != nil {
 		return nil, err
 	}

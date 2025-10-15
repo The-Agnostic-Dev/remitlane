@@ -1,7 +1,7 @@
-// Package notify sends operational email. MAIL_PROVIDER=outbox (the default)
+// Package mail sends operational email. MAIL_PROVIDER=outbox (the default)
 // writes messages to the outbox_messages table, shown at /_dev/outbox;
 // MAIL_PROVIDER=log only logs them.
-package notify
+package mail
 
 import (
 	"context"

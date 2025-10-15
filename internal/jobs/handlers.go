@@ -11,7 +11,7 @@ import (
 
 	"github.com/remitlane/remitlane/internal/clock"
 	"github.com/remitlane/remitlane/internal/config"
-	"github.com/remitlane/remitlane/internal/notify"
+	"github.com/remitlane/remitlane/internal/mail"
 	"github.com/remitlane/remitlane/internal/outbound"
 	"github.com/remitlane/remitlane/internal/payouts"
 	"github.com/remitlane/remitlane/internal/queue"
@@ -26,7 +26,7 @@ type Handlers struct {
 	Payouts  *payouts.Service
 	Webhooks *outbound.Service
 	Recon    *recon.Builder
-	Mail     notify.Sender
+	Mail     mail.Sender
 	Feed     rates.Feed
 	Clock    *clock.Clock
 	Config   config.Config
