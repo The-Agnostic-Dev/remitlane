@@ -47,6 +47,7 @@ type Config struct {
 	Webhooks WebhookConfig
 	Jobs     JobsConfig
 	Mail     MailConfig
+	Alerts   AlertsConfig
 }
 
 // RatesConfig holds the fixed mid-market rates used by the sandbox rate feed.
@@ -106,6 +107,11 @@ type MailConfig struct {
 	From     string
 	ReconTo  string
 	OpsTo    string
+}
+
+// AlertsConfig configures balance alerts.
+type AlertsConfig struct {
+	LowBalanceUSD int64
 }
 
 // Load reads the environment.
@@ -190,6 +196,7 @@ func Load() (Config, error) {
 		ReconTo:  e.str("RECON_EMAIL_TO", "finance@remitlane.com"),
 		OpsTo:    e.str("OPS_ALERT_EMAIL", "ops@remitlane.com"),
 	}
+	c.Alerts = AlertsConfig{LowBalanceUSD: int64(e.int("LOW_BALANCE_ALERT_USD", 5000))}
 
 	if err := e.err(); err != nil {
 		return Config{}, err

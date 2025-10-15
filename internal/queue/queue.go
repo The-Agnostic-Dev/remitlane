@@ -56,6 +56,7 @@ type Enqueuer interface {
 	Dispatch(ctx context.Context, payoutID string) error
 	Deliver(ctx context.Context, deliveryID int64, manual bool) error
 	Recon(ctx context.Context, date, triggeredBy string) error
+	LowBalance(ctx context.Context, partnerID, day string) error
 }
 
 // Options for retries.
@@ -117,3 +118,8 @@ func (c *Client) Recon(ctx context.Context, date, triggeredBy string) error {
 		asynq.Queue(Low), asynq.MaxRetry(2), asynq.Unique(time.Minute))
 }
 
+// LowBalance checks a partner's balance once per business day.
+func (c *Client) LowBalance(ctx context.Context, partnerID, day string) error {
+	return c.enqueue(ctx, TypeLowBalance, LowBalancePayload{PartnerID: partnerID, Day: day},
+		asynq.Queue(Low), asynq.MaxRetry(3), asynq.Unique(10*time.Minute))
+}
