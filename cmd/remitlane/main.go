@@ -16,6 +16,10 @@ import (
 	"syscall"
 	"time"
 
+	// The production image is distroless and has no zoneinfo; embed it so
+	// Africa/Lagos always loads.
+	_ "time/tzdata"
+
 	"github.com/remitlane/remitlane/internal/app"
 	"github.com/remitlane/remitlane/internal/config"
 	"github.com/remitlane/remitlane/internal/migrate"
