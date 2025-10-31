@@ -54,4 +54,14 @@ func TestPayoutErrorStatus(t *testing.T) {
 	}
 }
 
+func TestCursorRoundTrip(t *testing.T) {
+	at := time.Date(2026, 11, 3, 10, 4, 5, 123456000, time.UTC)
+	got, err := decodeCursor(encodeCursor(db.Payout{ID: "po_1", CreatedAt: at}))
+	if err != nil || !got.Equal(at) {
+		t.Errorf("got %s, %v", got, err)
+	}
+	if _, err := decodeCursor("not-a-cursor!"); err == nil {
+		t.Error("expected error")
+	}
+}
 
