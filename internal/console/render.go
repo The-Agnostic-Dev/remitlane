@@ -61,6 +61,7 @@ func (c *Console) funcs() template.FuncMap {
 		"add":      func(a, b int) int { return a + b },
 		"pct":      pct,
 		"seconds":  func(f float64) string { return strconv.FormatFloat(f, 'f', 1, 64) + "s" },
+		"pageLink": pageLink,
 	}
 }
 
@@ -101,12 +102,21 @@ func ago(t time.Time) string {
 		return "just now"
 	case d < time.Hour:
 		return fmt.Sprintf("%d min ago", int(d.Minutes()))
-	case d < 48*time.Hour:
+	case d < 24*time.Hour:
 		return fmt.Sprintf("%d h ago", int(d.Hours()))
 	}
 	return fmt.Sprintf("%d days ago", int(d.Hours()/24))
 }
 
+// pageLink keeps the current query string and swaps the page number.
+func pageLink(q url.Values, page int) string {
+	v := url.Values{}
+	for k, vals := range q {
+		v[k] = append([]string(nil), vals...)
+	}
+	v.Set("page", strconv.Itoa(page))
+	return "?" + v.Encode()
+}
 
 type flash struct {
 	Kind string

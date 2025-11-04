@@ -1,6 +1,7 @@
 {{define "content"}}
 <h1>Payouts</h1>
 <form method="get" action="/ops/payouts" class="filters" id="payout-filters">
+  <input type="hidden" name="page" value="{{.Data.Filter.Page}}">
   <label>Partner
     <select name="partner" data-autosubmit>
       <option value="">All partners</option>
@@ -53,9 +54,9 @@
   </tbody>
 </table>
 <nav class="pager">
-  {{if gt .Data.Filter.Page 1}}<a href="?page={{add .Data.Filter.Page -1}}">Previous</a>{{end}}
+  {{if gt .Data.Filter.Page 1}}<a href="{{pageLink .Data.Query (add .Data.Filter.Page -1)}}">Previous</a>{{end}}
   <span>Page {{.Data.Filter.Page}} of {{.Data.Pages}}</span>
-  {{if lt .Data.Filter.Page .Data.Pages}}<a href="?page={{add .Data.Filter.Page 1}}">Next</a>{{end}}
+  {{if lt .Data.Filter.Page .Data.Pages}}<a href="{{pageLink .Data.Query (add .Data.Filter.Page 1)}}">Next</a>{{end}}
 </nav>
 {{else}}
 <p class="empty" id="payouts-empty">No payouts match these filters.</p>
