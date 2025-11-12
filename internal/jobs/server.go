@@ -66,8 +66,8 @@ func NewScheduler(r asynq.RedisConnOpt, cfg config.Config, loc *time.Location, l
 
 type asynqLogger struct{ l *slog.Logger }
 
-func (a asynqLogger) Debug(args ...interface{}) { a.l.Debug(fmt.Sprint(args...)) }
-func (a asynqLogger) Info(args ...interface{})  { a.l.Info(fmt.Sprint(args...)) }
-func (a asynqLogger) Warn(args ...interface{})  { a.l.Warn(fmt.Sprint(args...)) }
-func (a asynqLogger) Error(args ...interface{}) { a.l.Error(fmt.Sprint(args...)) }
-func (a asynqLogger) Fatal(args ...interface{}) { a.l.Error(fmt.Sprint(args...)) }
+func (a asynqLogger) Debug(args ...any) { a.l.Debug(fmt.Sprint(args...)) }
+func (a asynqLogger) Info(args ...any)  { a.l.Info(fmt.Sprint(args...)) }
+func (a asynqLogger) Warn(args ...any)  { a.l.Warn(fmt.Sprint(args...)) }
+func (a asynqLogger) Error(args ...any) { a.l.Error(fmt.Sprint(args...)) }
+func (a asynqLogger) Fatal(args ...any) { a.l.Error(fmt.Sprint(args...)) }

@@ -14,7 +14,7 @@ import (
 const MaxBody = 1 << 20
 
 // WriteJSON writes v as JSON with the given status.
-func WriteJSON(w http.ResponseWriter, status int, v interface{}) {
+func WriteJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
 	enc := json.NewEncoder(w)
@@ -23,7 +23,7 @@ func WriteJSON(w http.ResponseWriter, status int, v interface{}) {
 }
 
 // DecodeJSON reads a JSON body into v.
-func DecodeJSON(r *http.Request, v interface{}) error {
+func DecodeJSON(r *http.Request, v any) error {
 	body, err := io.ReadAll(io.LimitReader(r.Body, MaxBody+1))
 	if err != nil {
 		return fmt.Errorf("read body: %w", err)
