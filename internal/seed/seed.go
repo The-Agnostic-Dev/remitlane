@@ -52,7 +52,7 @@ var Partners = []Partner{
 		ID: "prt_accrafreight", Slug: "accra-freight", Name: "Accra Freight", Country: "GH", Email: "it@accrafreight.com.gh",
 		Key: "rl_sandbox_accra_27c8d5f1e09ab346", LimitUSD: 20000,
 		Funding:  []money.Amount{money.New(9000000, money.USD)},
-		Receiver: 200, ReceiverNote: "Accra Freight staging receiver",
+		Receiver: 500, ReceiverNote: "Accra Freight staging endpoint has been down since Tuesday",
 	},
 }
 
