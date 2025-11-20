@@ -65,3 +65,10 @@ func TestCursorRoundTrip(t *testing.T) {
 	}
 }
 
+func TestPresentQuoteTotals(t *testing.T) {
+	q := quotes.Quote{ID: "qt_1", From: "USD", To: "GHS", Channel: rates.Bank, SourceMinor: 5000, DestMinor: 77913, FeeMinor: 150, Rate: "15.582700"}
+	out := presentQuote(q)
+	if out.TotalDebitMinor != 5150 || out.Object != "quote" {
+		t.Errorf("got %+v", out)
+	}
+}
