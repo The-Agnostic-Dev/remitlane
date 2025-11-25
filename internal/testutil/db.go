@@ -1,6 +1,6 @@
-// Package storetest holds helpers for tests that need Postgres. They run when
+// Package testutil holds helpers for tests that need Postgres. They run when
 // DATABASE_URL points at a disposable database and are skipped otherwise.
-package storetest
+package testutil
 
 import (
 	"context"

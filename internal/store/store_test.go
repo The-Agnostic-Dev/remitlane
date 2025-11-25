@@ -12,7 +12,7 @@ import (
 	"github.com/remitlane/remitlane/internal/ledger"
 	"github.com/remitlane/remitlane/internal/money"
 	"github.com/remitlane/remitlane/internal/store"
-	"github.com/remitlane/remitlane/internal/store/storetest"
+	"github.com/remitlane/remitlane/internal/testutil"
 )
 
 func partner(t *testing.T, st *store.Store, id string) {
@@ -44,7 +44,7 @@ func addPayout(t *testing.T, st *store.Store, partnerID, ref, status string, at 
 }
 
 func TestBalancesFollowLedger(t *testing.T) {
-	st := storetest.Store(t)
+	st := testutil.Store(t)
 	ctx := context.Background()
 	partner(t, st, "prt_a")
 	err := st.InTx(ctx, func(q *db.Queries, tx pgx.Tx) error {
@@ -68,7 +68,7 @@ func TestBalancesFollowLedger(t *testing.T) {
 }
 
 func TestLedgerRefusesUnbalanced(t *testing.T) {
-	st := storetest.Store(t)
+	st := testutil.Store(t)
 	ctx := context.Background()
 	partner(t, st, "prt_a")
 	err := st.InTx(ctx, func(q *db.Queries, _ pgx.Tx) error {
@@ -81,7 +81,7 @@ func TestLedgerRefusesUnbalanced(t *testing.T) {
 }
 
 func TestListPartnerPayoutsPages(t *testing.T) {
-	st := storetest.Store(t)
+	st := testutil.Store(t)
 	ctx := context.Background()
 	partner(t, st, "prt_a")
 	base := time.Date(2026, 10, 1, 9, 0, 0, 0, time.UTC)
@@ -105,7 +105,7 @@ func TestListPartnerPayoutsPages(t *testing.T) {
 }
 
 func TestConsoleFilters(t *testing.T) {
-	st := storetest.Store(t)
+	st := testutil.Store(t)
 	ctx := context.Background()
 	partner(t, st, "prt_a")
 	partner(t, st, "prt_b")
@@ -127,7 +127,7 @@ func TestConsoleFilters(t *testing.T) {
 }
 
 func TestUsedUSDSkipsFailed(t *testing.T) {
-	st := storetest.Store(t)
+	st := testutil.Store(t)
 	ctx := context.Background()
 	partner(t, st, "prt_a")
 	at := time.Date(2026, 10, 2, 12, 0, 0, 0, time.UTC)
@@ -144,7 +144,7 @@ func TestUsedUSDSkipsFailed(t *testing.T) {
 }
 
 func TestRequeueFailedForEndpoint(t *testing.T) {
-	st := storetest.Store(t)
+	st := testutil.Store(t)
 	ctx := context.Background()
 	partner(t, st, "prt_a")
 	ep, err := st.Q.CreateEndpoint(ctx, db.CreateEndpointParams{PartnerID: "prt_a", Url: "http://example.invalid/hook", Secret: "s"})
