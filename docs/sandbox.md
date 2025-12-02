@@ -44,3 +44,8 @@ is UTF-8 JSON and MoMoBridge does not escape HTML characters (`&` stays `&`).
 KES and UGX amounts must be whole shillings; anything else is refused with `422 INVALID_AMOUNT`, like the live rails.
 GHS takes pesewas.
 
+## Partner webhooks
+
+Seeded partners' webhook endpoints point at `/_dev/receiver/<slug>`, which records each attempt and answers with the
+status configured for that partner (`/_dev/receiver`, or `POST /_dev/receiver/<slug>/config` with `respond_with`).
+Kobopay answers 200, Duka Market 202, Accra Freight 500.
