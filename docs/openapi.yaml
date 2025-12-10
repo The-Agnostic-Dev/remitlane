@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Remitlane API
-  version: "1.6"
+  version: "1.5"
   description: |
     Quote and send payouts to bank accounts and mobile money in Nigeria, Kenya, Ghana and Uganda.
     Amounts are integers in minor units (UGX has no minor unit). See docs/api.md for the narrative guide.
@@ -83,6 +83,42 @@ paths:
       responses:
         "200": { description: Payout, content: { application/json: { schema: { $ref: "#/components/schemas/Payout" } } } }
         "404": { $ref: "#/components/responses/Error" }
+  /payouts/bulk:
+    post:
+      summary: Create up to 500 payouts priced by destination amount
+      parameters: [{ $ref: "#/components/parameters/IdempotencyKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [reference, items]
+              properties:
+                reference: { type: string }
+                items:
+                  type: array
+                  maxItems: 500
+                  items:
+                    type: object
+                    required: [reference, source_currency, destination_currency, channel, amount_minor, recipient]
+                    properties:
+                      reference: { type: string }
+                      source_currency: { $ref: "#/components/schemas/Currency" }
+                      destination_currency: { $ref: "#/components/schemas/Currency" }
+                      channel: { $ref: "#/components/schemas/Channel" }
+                      amount_minor: { type: integer, description: destination amount }
+                      narration: { type: string }
+                      recipient: { $ref: "#/components/schemas/Recipient" }
+      responses:
+        "201": { description: Batch, content: { application/json: { schema: { $ref: "#/components/schemas/Batch" } } } }
+        "422": { $ref: "#/components/responses/Error" }
+  /batches/{id}:
+    get:
+      summary: Get a batch with its payouts
+      parameters: [{ $ref: "#/components/parameters/Id" }]
+      responses:
+        "200": { description: Batch, content: { application/json: { schema: { $ref: "#/components/schemas/Batch" } } } }
   /balances:
     get:
       summary: Balances per currency
@@ -102,6 +138,24 @@ paths:
                         currency: { $ref: "#/components/schemas/Currency" }
                         available_minor: { type: integer }
                         held_minor: { type: integer }
+  /limits:
+    get:
+      summary: Today's daily limit usage (USD, Lagos business day)
+      responses:
+        "200":
+          description: Limits
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  currency: { type: string, const: USD }
+                  daily_limit_minor: { type: integer }
+                  used_today_minor: { type: integer }
+                  remaining_today_minor: { type: integer }
+                  window_start: { type: string, format: date-time }
+                  window_end: { type: string, format: date-time }
+                  time_zone: { type: string, example: Africa/Lagos }
 components:
   securitySchemes:
     apiKey: { type: http, scheme: bearer }
