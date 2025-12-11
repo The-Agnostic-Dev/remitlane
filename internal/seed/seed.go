@@ -46,7 +46,7 @@ var Partners = []Partner{
 		ID: "prt_dukamarket", Slug: "duka-market", Name: "Duka Market", Country: "KE", Email: "finance@dukamarket.co.ke",
 		Key: "rl_sandbox_duka_9b31e6a0c4d27f18", LimitUSD: 30000,
 		Funding:  []money.Amount{money.New(15000000, money.USD)},
-		Receiver: 200, ReceiverNote: "Duka Market staging receiver",
+		Receiver: 202, ReceiverNote: "Duka's queue-backed receiver acknowledges with 202",
 	},
 	{
 		ID: "prt_accrafreight", Slug: "accra-freight", Name: "Accra Freight", Country: "GH", Email: "it@accrafreight.com.gh",
