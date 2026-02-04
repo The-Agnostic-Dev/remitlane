@@ -17,16 +17,15 @@ func (h *Handler) momobridge(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "cannot read body", http.StatusBadRequest)
 		return
 	}
-	var cb momobridge.Callback
-	if err := json.Unmarshal(body, &cb); err != nil {
-		h.record(r.Context(), providers.MoMoBridge, "", "", false, "unparseable", body)
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+	if err := sig.VerifyBase64(h.momoSecret, body, r.Header.Get(momobridge.SignatureHeader)); err != nil {
+		h.record(r.Context(), providers.MoMoBridge, "", "", false, "bad_signature", body)
+		http.Error(w, "invalid signature", http.StatusUnauthorized)
 		return
 	}
-	canonical, _ := json.Marshal(cb)
-	if err := sig.VerifyBase64(h.momoSecret, canonical, r.Header.Get(momobridge.SignatureHeader)); err != nil {
-		h.record(r.Context(), providers.MoMoBridge, cb.ExternalID, cb.Status, false, "bad_signature", body)
-		http.Error(w, "invalid signature", http.StatusUnauthorized)
+	var cb momobridge.Callback
+	if err := json.Unmarshal(body, &cb); err != nil {
+		h.record(r.Context(), providers.MoMoBridge, "", "", true, "unparseable", body)
+		http.Error(w, "invalid JSON", http.StatusBadRequest)
 		return
 	}
 	st := momobridge.MapStatus(cb.Status)
