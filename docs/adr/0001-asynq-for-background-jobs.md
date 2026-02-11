@@ -22,3 +22,4 @@ for now (one container to operate). Tasks carry ids only, never payout state; ha
 - Redis is now required to run anything, including locally.
 - A handler can run more than once (retries, worker restarts), so every handler must be safe to repeat: dispatch
   checks the payout is still `pending`, delivery checks the delivery is not already delivered.
+- We can split the worker into its own deployment later without code changes.
