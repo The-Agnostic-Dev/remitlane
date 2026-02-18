@@ -81,7 +81,7 @@ func (c *Console) login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.SetCookie(w, &http.Cookie{
-		Name: sessionCookie, Value: token, Path: "/ops", HttpOnly: true, Secure: c.cfg.SecureCookies,
+		Name: sessionCookie, Value: token, Path: "/", HttpOnly: true, Secure: c.cfg.SecureCookies,
 		SameSite: http.SameSiteLaxMode, MaxAge: int(c.cfg.SessionTTL.Seconds()),
 	})
 	c.log.Info("console login", "email", u.Email)

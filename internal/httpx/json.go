@@ -31,6 +31,9 @@ func DecodeJSON(r *http.Request, v any) error {
 	if len(body) > MaxBody {
 		return errors.New("request body is too large")
 	}
+	if len(body) == 0 {
+		return errors.New("request body is empty")
+	}
 	if err := json.Unmarshal(body, v); err != nil {
 		var syn *json.SyntaxError
 		if errors.As(err, &syn) {
