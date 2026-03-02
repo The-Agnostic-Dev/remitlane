@@ -42,6 +42,13 @@ func (c *Clock) Today() string { return c.Now().Format(dateLayout) }
 // Yesterday is the previous business date.
 func (c *Clock) Yesterday() string { return c.Now().AddDate(0, 0, -1).Format(dateLayout) }
 
+// DayBounds returns the start (inclusive) and end (exclusive) of the business
+// day that contains t.
+func (c *Clock) DayBounds(t time.Time) (time.Time, time.Time) {
+	l := t.In(c.loc)
+	start := time.Date(l.Year(), l.Month(), l.Day(), 0, 0, 0, 0, c.loc)
+	return start, start.AddDate(0, 0, 1)
+}
 
 // DateBounds returns the bounds of a business date given as "2006-01-02".
 func (c *Clock) DateBounds(date string) (time.Time, time.Time, error) {

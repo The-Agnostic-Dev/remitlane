@@ -44,8 +44,7 @@ func New(s *store.Store, c *clock.Clock) *Service { return &Service{store: s, cl
 
 // Usage returns today's usage for a partner.
 func (s *Service) Usage(ctx context.Context, p db.Partner) (Usage, error) {
-	start := time.Now().UTC().Truncate(24 * time.Hour)
-	end := start.Add(24 * time.Hour)
+	start, end := s.clock.DayBounds(s.clock.Now())
 	used, err := s.store.UsedUSD(ctx, p.ID, start, end)
 	if err != nil {
 		return Usage{}, err

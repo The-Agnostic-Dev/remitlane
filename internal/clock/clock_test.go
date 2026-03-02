@@ -44,6 +44,19 @@ func TestDateBounds(t *testing.T) {
 	}
 }
 
+func TestDayBoundsAcrossMidnight(t *testing.T) {
+	loc := lagos(t)
+	c := Fixed(time.Now(), loc)
+	// 23:40 UTC on 5 March is already 6 March in Lagos: that day began at 23:00 UTC.
+	start, end := c.DayBounds(time.Date(2026, 3, 5, 23, 40, 0, 0, time.UTC))
+	if want := time.Date(2026, 3, 5, 23, 0, 0, 0, time.UTC); !start.Equal(want) {
+		t.Errorf("start = %s, want %s", start.UTC(), want)
+	}
+	if !end.Equal(start.Add(24 * time.Hour)) {
+		t.Errorf("end = %s", end.UTC())
+	}
+}
+
 func TestDisplay(t *testing.T) {
 	loc := lagos(t)
 	c := Fixed(time.Now(), loc)
