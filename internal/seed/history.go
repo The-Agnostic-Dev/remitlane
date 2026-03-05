@@ -99,6 +99,23 @@ func (g *generator) history(ctx context.Context, q *db.Queries, tx pgx.Tx) error
 		return err
 	}
 
+	// Either side of Lagos midnight: late last night and just after midnight.
+	duka := Partners[1]
+	kes := mixes["prt_dukamarket"][0]
+	late := today.Add(-30 * time.Minute)
+	early := today.Add(15 * time.Minute)
+	if early.After(now.Add(-2 * time.Minute)) {
+		early = now.Add(-2 * time.Minute)
+	}
+	for _, s := range []spec{
+		{partner: duka, mix: kes, destMajor: 64500, at: late, status: domain.Completed, ref: "DM-ORD-2330"},
+		{partner: duka, mix: kes, destMajor: 38250, at: early, status: domain.Completed, ref: "DM-ORD-0015"},
+	} {
+		if _, err := g.insert(ctx, q, tx, s); err != nil {
+			return err
+		}
+	}
+
 	// Uganda payouts for Duka's sellers in Kampala.
 	ugBank, ugMobile := mixes["prt_dukamarket"][3], mixes["prt_dukamarket"][2]
 	for i, s := range []spec{
