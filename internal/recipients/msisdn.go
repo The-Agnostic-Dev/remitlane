@@ -17,8 +17,8 @@ var dialCodes = map[string]string{
 var mobilePatterns = map[string]*regexp.Regexp{
 	// Safaricom and Airtel: 07xx and 01xx.
 	"KE": regexp.MustCompile(`^254(7\d|1[01])\d{7}$`),
-	// MTN, Telecel and AirtelTigo numbers all start 02 or 05.
-	"GH": regexp.MustCompile(`^233[25]\d{8}$`),
+	// MTN 024/025/053/054/055/059, AirtelTigo 026/027/056/057.
+	"GH": regexp.MustCompile(`^233(2[4-7]|5[3-79])\d{7}$`),
 	// MTN 077/078/076, Airtel 070/074/075.
 	"UG": regexp.MustCompile(`^256(7[0-8])\d{7}$`),
 }

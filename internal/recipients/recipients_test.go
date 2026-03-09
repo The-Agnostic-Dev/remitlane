@@ -31,6 +31,7 @@ func TestNormalizeMSISDNRejects(t *testing.T) {
 	for _, tc := range []struct{ raw, country string }{
 		{"0201234567", "KE"},
 		{"0302123456", "GH"}, // Accra landline
+		{"0284123456", "GH"}, // not a mobile range
 		{"07123", "KE"},
 		{"0712abc678", "KE"},
 		{"", "UG"},
