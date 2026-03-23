@@ -42,6 +42,10 @@ func (a *API) idempotent(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
+		if len(key) > 255 {
+			writeError(w, r, http.StatusBadRequest, "validation_error", "Idempotency-Key must be at most 255 characters")
+			return
+		}
 		body, err := io.ReadAll(io.LimitReader(r.Body, httpx.MaxBody))
 		if err != nil {
 			writeError(w, r, http.StatusBadRequest, "validation_error", "cannot read request body")
