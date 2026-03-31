@@ -1,0 +1,10 @@
+# Payments core: any change here needs one of us.
+/internal/ledger/     @remitlane/payments-core
+/internal/payouts/    @remitlane/payments-core
+/internal/rates/      @remitlane/payments-core
+/internal/providers/  @remitlane/payments-core
+/migrations/          @remitlane/payments-core
+
+/internal/console/    @remitlane/ops-tools
+/.github/             @remitlane/platform
+/Dockerfile           @remitlane/platform
