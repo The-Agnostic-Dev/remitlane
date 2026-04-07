@@ -18,6 +18,14 @@
   </section>
 {{end}}
 </div>
-{{end}}
+{{range $name, $events := .Data.Events}}
+<h2>Latest {{provider $name}} webhooks</h2>
+<table class="grid compact">
+  <thead><tr><th>Received</th><th>Reference</th><th>Status</th><th>Signature</th><th>Outcome</th></tr></thead>
+  <tbody>
+  {{range $events}}<tr><td>{{when .ReceivedAt}}</td><td class="mono">{{.Reference}}</td><td>{{.Status}}</td><td>{{if .SignatureOk}}ok{{else}}<span class="bad">invalid</span>{{end}}</td><td>{{.Outcome}}</td></tr>
+  {{else}}<tr><td colspan="5" class="empty">None yet.</td></tr>{{end}}
+  </tbody>
+</table>
 {{end}}
 {{end}}
