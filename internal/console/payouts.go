@@ -108,6 +108,22 @@ func (c *Console) payout(w http.ResponseWriter, r *http.Request) {
 		c.fail(w, r, err)
 		return
 	}
+	data.Sandbox = c.sandboxAttempts(p)
 	c.renderTitled(w, r, "payout", "Payout "+p.ID, data)
 }
 
+// sandboxAttempts lists what the sandbox provider received for a payout.
+func (c *Console) sandboxAttempts(p db.Payout) []sandboxAttempt {
+	var out []sandboxAttempt
+	switch {
+	case p.Provider == "swiftpay" && c.swiftpay != nil:
+		for _, t := range c.swiftpay.Transfers(p.ID) {
+			out = append(out, sandboxAttempt{ID: t.ID, Status: t.Status, CreatedAt: t.CreatedAt, Callbacks: len(t.Callbacks)})
+		}
+	case p.Provider == "momobridge" && c.momo != nil:
+		for _, d := range c.momo.Disbursements(p.ID) {
+			out = append(out, sandboxAttempt{ID: d.ID, Status: d.Status, CreatedAt: d.CreatedAt.Format("2006-01-02T15:04:05Z"), Callbacks: len(d.Callbacks)})
+		}
+	}
+	return out
+}

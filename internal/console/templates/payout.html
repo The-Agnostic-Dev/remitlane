@@ -51,7 +51,13 @@
   <tbody>{{range .Data.Deliveries}}<tr><td>{{.Type}}<div class="sub mono">{{.EventID}}</div></td><td>{{.Status}}</td><td class="num">{{.Attempts}}</td><td class="num">{{.LastStatusCode}}</td><td class="mono sub">{{.Url}}</td></tr>{{end}}</tbody>
 </table>
 {{else}}<p class="muted">No webhooks sent for this payout yet.</p>{{end}}
-{{end}}
 
+{{if .Data.Sandbox}}
+<h2>Sandbox provider requests</h2>
+<p class="muted">What the {{provider $p.Provider}} sandbox received for this payout.</p>
+<table class="grid" id="sandbox-requests">
+  <thead><tr><th>Provider id</th><th>Status</th><th>Created</th><th class="num">Callbacks</th></tr></thead>
+  <tbody>{{range .Data.Sandbox}}<tr><td class="mono">{{.ID}}</td><td>{{.Status}}</td><td>{{.CreatedAt}}</td><td class="num">{{.Callbacks}}</td></tr>{{end}}</tbody>
+</table>
 {{end}}
 {{end}}
