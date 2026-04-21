@@ -31,7 +31,7 @@ func NormalizeMSISDN(raw, country string) (string, error) {
 	if !ok {
 		return "", fieldErr("country", "mobile money payouts to %s are not supported", country)
 	}
-	s := strings.ReplaceAll(strings.TrimSpace(raw), " ", "")
+	s := strings.NewReplacer(" ", "", "-", "", "(", "", ")", "").Replace(strings.TrimSpace(raw))
 	s = strings.TrimPrefix(s, "+")
 	switch {
 	case s == "":

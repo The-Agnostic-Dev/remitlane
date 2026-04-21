@@ -18,6 +18,8 @@ func TestNormalizeMSISDN(t *testing.T) {
 		{"00256772123456", "UG", "256772123456"},
 		{"0244123456", "GH", "233244123456"},
 		{"+233 55 412 3456", "GH", "233554123456"},
+		{"0712-345-678", "KE", "254712345678"},
+		{"(0772) 123456", "UG", "256772123456"},
 	}
 	for _, tc := range cases {
 		got, err := NormalizeMSISDN(tc.raw, tc.country)
