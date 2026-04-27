@@ -43,7 +43,7 @@ func TestWriteCSV(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(recs) != 1+3 {
+	if len(recs) != 1+3+2 {
 		t.Fatalf("got %d records", len(recs))
 	}
 	if recs[2][8] != "1850000" {

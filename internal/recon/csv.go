@@ -37,6 +37,15 @@ func WriteCSV(w io.Writer, r Report, loc *time.Location) error {
 			return err
 		}
 	}
+	for _, t := range r.Totals {
+		if err := cw.Write([]string{
+			"TOTAL", "", fmt.Sprintf("%d payouts", t.Count), "", "", "", "",
+			string(t.Currency), money.MinorToDecimal(t.DestMinor, t.Currency), "", "", "",
+			money.MinorToDecimal(t.USDMinor, money.USD), "", "",
+		}); err != nil {
+			return err
+		}
+	}
 	cw.Flush()
 	return cw.Error()
 }
