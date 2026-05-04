@@ -3,11 +3,11 @@ module github.com/remitlane/remitlane
 go 1.24.0
 
 require (
-	github.com/go-chi/chi/v5 v5.2.2
+	github.com/go-chi/chi/v5 v5.2.3
 	github.com/hibiken/asynq v0.25.1
-	github.com/jackc/pgx/v5 v5.7.4
-	github.com/pressly/goose/v3 v3.24.1
-	golang.org/x/crypto v0.36.0
+	github.com/jackc/pgx/v5 v5.7.6
+	github.com/pressly/goose/v3 v3.26.0
+	golang.org/x/crypto v0.40.0
 	golang.org/x/time v0.8.0
 )
 
