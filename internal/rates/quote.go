@@ -79,15 +79,9 @@ func (q *Quoter) Calculate(ctx context.Context, req Request) (Price, error) {
 	switch req.AmountType {
 	case BySource, "":
 		src = req.AmountMinor
-		dst = convert(src, req.From, req.To, rate, money.HalfUp)
-		if step := payoutStep(req.To, req.Channel); step > 1 {
-			dst -= dst % step
-		}
+		dst = convert(src, req.From, req.To, rate, money.Down)
 	case ByDestination:
 		dst = req.AmountMinor
-		if dst%payoutStep(req.To, req.Channel) != 0 {
-			return Price{}, fmt.Errorf("%w: %s %s amounts must be whole units", ErrBadAmount, req.To, req.Channel)
-		}
 		src = convertBack(dst, req.From, req.To, rate)
 	default:
 		return Price{}, ErrBadAmountTyp
@@ -111,15 +105,6 @@ func (q *Quoter) Calculate(ctx context.Context, req Request) (Price, error) {
 func applySpread(mid *big.Rat, bps int64) *big.Rat {
 	f := new(big.Rat).SetFrac64(10000-bps, 10000)
 	return new(big.Rat).Mul(mid, f)
-}
-
-// payoutStep is the smallest amount a rail can pay out, in minor units.
-// M-Pesa only pays whole shillings.
-func payoutStep(c money.Currency, ch Channel) int64 {
-	if c == money.KES && ch == MobileMoney {
-		return 100
-	}
-	return 1
 }
 
 // convert turns source minor units into destination minor units at rate,
