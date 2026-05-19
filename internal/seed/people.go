@@ -6,9 +6,9 @@ var names = map[string][]string{
 	"NG": {"Chinedu Okafor", "Aisha Bello", "Tunde Adebayo", "Ngozi Eze", "Emeka Nwankwo", "Funmilayo Ojo",
 		"Ibrahim Musa", "Kemi Adeyemi", "Obinna Uche", "Halima Sani", "Segun Bakare", "Chiamaka Obi"},
 	"KE": {"Achieng Otieno", "Kamau Njoroge", "Mercy Wambui", "Otieno Odhiambo", "Faith Chebet", "Brian Kiprop",
-		"Njeri Mwangi"},
+		"Njeri Mwangi", "Kevin Mutua", "Grace Akinyi", "Daniel Kiplagat"},
 	"GH": {"Kwame Boateng", "Akosua Mensah", "Yaw Owusu", "Abena Asante", "Kofi Appiah", "Esi Quaye",
-		"Kwabena Darko"},
+		"Kwabena Darko", "Ama Serwaa", "Nana Agyeman", "Efua Annan"},
 	"UG": {"Nakato Sarah", "Okello David", "Namubiru Grace", "Mugisha Ivan", "Atim Brenda", "Ssempala Joseph"},
 }
 
