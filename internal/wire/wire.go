@@ -64,7 +64,7 @@ func FromPayout(p db.Payout) Payout {
 		QuoteID: p.QuoteID.String, BatchID: p.BatchID.String,
 		SourceCurrency: p.SourceCurrency, SourceAmountMinor: p.SourceAmountMinor, FeeMinor: p.FeeMinor,
 		DestinationCurrency: p.DestCurrency, DestinationAmountMinor: p.DestAmountMinor,
-		Rate: p.Rate,
+		Rate: trimRate(p.Rate),
 		Recipient: Recipient{
 			Name: p.RecipientName, Country: p.RecipientCountry, BankCode: p.BankCode,
 			AccountNumber: p.AccountNumber, MSISDN: p.Msisdn,
@@ -81,3 +81,10 @@ func FromPayout(p db.Payout) Payout {
 	return out
 }
 
+// trimRate renders a NUMERIC(20,8) rate with six decimals, as quotes do.
+func trimRate(r string) string {
+	if len(r) > 2 && r[len(r)-2:] == "00" {
+		return r[:len(r)-2]
+	}
+	return r
+}
