@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/remitlane/remitlane/internal/db"
+	"github.com/remitlane/remitlane/internal/domain"
 	"github.com/remitlane/remitlane/internal/httpx"
 	"github.com/remitlane/remitlane/internal/store"
 	"github.com/remitlane/remitlane/internal/wire"
@@ -57,6 +58,10 @@ func (a *API) listPayouts(w http.ResponseWriter, r *http.Request) {
 		PartnerID: partnerFrom(r.Context()).ID, Reference: q.Get("reference"), BatchID: q.Get("batch_id"), Limit: limit,
 	}
 	if st := q.Get("status"); st != "" {
+		if !validStatus(st) {
+			writeError(w, r, http.StatusBadRequest, "validation_error", "unknown status "+strconv.Quote(st))
+			return
+		}
 		f.Status = st
 	}
 	if c := q.Get("cursor"); c != "" {
@@ -82,3 +87,11 @@ func (a *API) listPayouts(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, resp)
 }
 
+func validStatus(s string) bool {
+	for _, st := range domain.AllStatuses() {
+		if string(st) == s {
+			return true
+		}
+	}
+	return false
+}
