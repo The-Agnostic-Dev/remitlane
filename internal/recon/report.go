@@ -50,11 +50,7 @@ func (b *Builder) Build(ctx context.Context, date string) (Report, error) {
 	if date > b.clock.Today() {
 		return Report{}, ErrFutureDate
 	}
-	from, to, err := b.clock.DateBounds(date)
-	if err != nil {
-		return Report{}, err
-	}
-	rows, err := b.store.ReconRows(ctx, from, to)
+	rows, err := b.store.ReconRows(ctx, date)
 	if err != nil {
 		return Report{}, err
 	}

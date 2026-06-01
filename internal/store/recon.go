@@ -27,16 +27,16 @@ type ReconRow struct {
 	CompletedAt  pgtype.Timestamptz
 }
 
-// ReconRows returns the payouts created in [from, to).
-func (s *Store) ReconRows(ctx context.Context, from, to time.Time) ([]ReconRow, error) {
+// ReconRows returns the payouts created on a business date ("2006-01-02").
+func (s *Store) ReconRows(ctx context.Context, date string) ([]ReconRow, error) {
 	rows, err := s.Pool.Query(ctx, `
 		SELECT p.id, pr.name, p.reference, p.provider, p.provider_ref, p.status, p.channel,
 		       p.dest_currency, p.dest_amount_minor, p.source_currency, p.source_amount_minor,
 		       p.fee_minor, p.usd_amount_minor, p.created_at, p.completed_at
 		FROM payouts p
 		JOIN partners pr ON pr.id = p.partner_id
-		WHERE p.created_at >= $1 AND p.created_at < $2
-		ORDER BY p.created_at, p.id`, from, to)
+		WHERE p.created_at >= $1::date AND p.created_at < $1::date + 1
+		ORDER BY p.created_at, p.id`, date)
 	if err != nil {
 		return nil, err
 	}
