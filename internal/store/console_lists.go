@@ -50,7 +50,8 @@ func (s *Store) ListConsolePayouts(ctx context.Context, f ConsoleFilter) ([]Cons
 	}
 	if q := strings.TrimSpace(f.Search); q != "" {
 		args = append(args, q, "%"+strings.ToLower(q)+"%")
-		where = append(where, fmt.Sprintf("(p.id = $%d OR lower(p.reference) LIKE $%d)", len(args)-1, len(args)))
+		where = append(where, fmt.Sprintf("(p.id = $%d OR lower(p.reference) LIKE $%d OR lower(p.recipient_name) LIKE $%d)",
+			len(args)-1, len(args), len(args)))
 	}
 	cond := ""
 	if len(where) > 0 {
