@@ -11,9 +11,10 @@ import (
 	"github.com/remitlane/remitlane/internal/providers"
 )
 
-// Dispatch sends a pending payout to its provider. Errors are returned so
-// the job retries.
-func (s *Service) Dispatch(ctx context.Context, payoutID string) error {
+// Dispatch sends a pending payout to its provider. A temporary failure is
+// returned so the job retries; on the last attempt, or when the provider
+// rejects the transfer, the payout fails and its funds are released.
+func (s *Service) Dispatch(ctx context.Context, payoutID string, lastAttempt bool) error {
 	p, err := s.store.Q.GetPayout(ctx, payoutID)
 	if err != nil {
 		return err
@@ -28,8 +29,11 @@ func (s *Service) Dispatch(ctx context.Context, payoutID string) error {
 	res, err := prov.Send(ctx, transferRequest(p))
 	if err != nil {
 		var rej *providers.RejectedError
-		if errors.As(err, &rej) {
+		switch {
+		case errors.As(err, &rej):
 			return s.fail(ctx, p, rej.Code, rej.Message)
+		case lastAttempt:
+			return s.fail(ctx, p, "provider_unavailable", err.Error())
 		}
 		s.log.Warn("dispatch failed, will retry", "payout_id", p.ID, "err", err)
 		return err

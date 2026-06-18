@@ -63,7 +63,8 @@ func (h *Handlers) dispatch(ctx context.Context, t *asynq.Task) error {
 	if err := decode(t, &p); err != nil {
 		return err
 	}
-	err := h.Payouts.Dispatch(ctx, p.PayoutID)
+	_, last := lastAttempt(ctx)
+	err := h.Payouts.Dispatch(ctx, p.PayoutID, last)
 	if store.IsNotFound(err) {
 		return fmt.Errorf("payout %s: %w", p.PayoutID, asynq.SkipRetry)
 	}
