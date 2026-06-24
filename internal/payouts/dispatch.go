@@ -35,7 +35,7 @@ func (s *Service) Dispatch(ctx context.Context, payoutID string, lastAttempt boo
 		case lastAttempt:
 			return s.fail(ctx, p, "provider_unavailable", err.Error())
 		}
-		s.log.Warn("dispatch failed, will retry", "payout_id", p.ID, "err", err)
+		s.log.Warn("dispatch failed, will retry", "payout_id", p.ID, "provider", p.Provider, "err", err)
 		return err
 	}
 	_, err = s.Apply(ctx, p.ID, Update{
