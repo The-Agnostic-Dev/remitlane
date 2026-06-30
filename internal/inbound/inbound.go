@@ -67,5 +67,9 @@ func (h *Handler) apply(ctx context.Context, payoutID string, u payouts.Update) 
 }
 
 func ack(w http.ResponseWriter, outcome string) {
-	httpx.WriteJSON(w, http.StatusOK, map[string]string{"received": "true", "outcome": outcome})
+	status := http.StatusOK
+	if outcome == "error" {
+		status = http.StatusInternalServerError
+	}
+	httpx.WriteJSON(w, status, map[string]string{"received": "true", "outcome": outcome})
 }
