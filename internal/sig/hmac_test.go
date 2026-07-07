@@ -32,3 +32,13 @@ func TestBase64RoundTrip(t *testing.T) {
 	}
 }
 
+func TestVerifyPayload(t *testing.T) {
+	type cb struct {
+		ID     string `json:"id"`
+		Status string `json:"status"`
+	}
+	body := []byte(`{"id":"mmb_1","status":"SUCCESSFUL"}`)
+	if err := VerifyPayload("k", cb{"mmb_1", "SUCCESSFUL"}, Base64("k", body)); err != nil {
+		t.Fatal(err)
+	}
+}

@@ -6,6 +6,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"strings"
 )
@@ -52,3 +53,13 @@ func VerifyBase64(secret string, body []byte, signature string) error {
 	return nil
 }
 
+// VerifyPayload checks a base64 signature over the compact JSON encoding of
+// payload. Providers sign compact JSON, so verifying the decoded payload
+// keeps us independent of whitespace a proxy may add on the way in.
+func VerifyPayload(secret string, payload any, signature string) error {
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+	return VerifyBase64(secret, body, signature)
+}
