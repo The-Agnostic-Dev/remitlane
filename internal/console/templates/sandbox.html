@@ -21,6 +21,20 @@
       <button type="submit">Set next outcome</button>
     </form>
   </section>
+  <section class="card">
+    <h2>MoMoBridge (mobile money)</h2>
+    <ul class="hints">
+      <li>Number ending <code>0000</code>: fails (SUBSCRIBER_NOT_FOUND)</li>
+      <li>Number ending <code>5555</code>: settles without a callback</li>
+      <li>KES and UGX amounts must be whole shillings, like the live rails</li>
+    </ul>
+    <form method="post" action="/ops/sandbox/force" class="inline">
+      <input type="hidden" name="csrf" value="{{.User.CSRF}}">
+      <input type="hidden" name="provider" value="momobridge">
+      <select name="scenario"><option value="">Normal rules</option>{{range .Data.MoMoScenarios}}<option {{if eq . $.Data.MoMoForced}}selected{{end}}>{{.}}</option>{{end}}</select>
+      <button type="submit">Set next outcome</button>
+    </form>
+  </section>
 </div>
 <h2>Swiftpay transfers</h2>
 <table class="grid compact" id="swiftpay-transfers">
@@ -28,7 +42,11 @@
   <tbody>{{range .Data.Transfers}}<tr data-reference="{{.Reference}}"><td class="mono">{{.ID}}</td><td class="mono"><a href="/ops/payouts/{{.Reference}}">{{.Reference}}</a></td><td class="num">{{.Currency}} {{.Amount}}</td><td>{{.Status}}</td><td>{{.Scenario}}</td>
     <td>{{range .Callbacks}}<span class="pill">{{.Status}} {{.Code}}</span> {{end}}</td></tr>{{else}}<tr><td colspan="6" class="empty">No transfers since the app started.</td></tr>{{end}}</tbody>
 </table>
-{{end}}
-{{end}}
+<h2>MoMoBridge disbursements</h2>
+<table class="grid compact" id="momo-disbursements">
+  <thead><tr><th>Disbursement</th><th>External id</th><th>Number</th><th class="num">Amount</th><th>Status</th><th>Callbacks</th></tr></thead>
+  <tbody>{{range .Data.Disbursements}}<tr data-reference="{{.ExternalID}}"><td class="mono">{{.ID}}</td><td class="mono"><a href="/ops/payouts/{{.ExternalID}}">{{.ExternalID}}</a></td><td class="mono">{{.MSISDN}}</td><td class="num">{{.Currency}} {{.Amount}}</td><td>{{.Status}}</td>
+    <td>{{range .Callbacks}}<span class="pill">{{.Status}} {{.Code}}</span> {{end}}</td></tr>{{else}}<tr><td colspan="6" class="empty">No disbursements since the app started.</td></tr>{{end}}</tbody>
+</table>
 {{end}}
 {{end}}
