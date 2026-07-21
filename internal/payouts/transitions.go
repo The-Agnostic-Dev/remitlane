@@ -48,6 +48,9 @@ func (s *Service) Apply(ctx context.Context, payoutID string, u Update) (db.Payo
 		}
 		if !domain.CanMove(from, u.Status) {
 			s.log.Warn("ignoring status update", "payout_id", p.ID, "from", from, "to", u.Status, "source", u.Source)
+			_ = q.InsertPayoutEvent(ctx, db.InsertPayoutEventParams{
+				PayoutID: p.ID, Status: string(u.Status), Source: u.Source, Detail: "ignored: payout is " + string(from),
+			})
 			out = p
 			return ErrIgnored
 		}
