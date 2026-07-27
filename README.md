@@ -141,6 +141,22 @@ ops can retry one delivery or everything for a partner once the partner's endpoi
 If a provider webhook never arrives, the poller asks the provider about payouts that have not moved for
 `POLL_STUCK_AFTER` (30 minutes). See [docs/runbooks/stuck-payouts.md](docs/runbooks/stuck-payouts.md).
 
+## The fakes
+
+Nothing here talks to a real provider or mail service. Each outside system has a local fake, picked by env:
+
+| System | Env | Fake | What it does |
+| --- | --- | --- | --- |
+| Swiftpay | `SWIFTPAY_MODE=sandbox` | `internal/providers/swiftpay/sandbox` | v2 transfers API at `/_sandbox/swiftpay`; signed v2 (or v1) webhooks back to `/webhooks/swiftpay` after a delay |
+| MoMoBridge | `MOMOBRIDGE_MODE=sandbox` | `internal/providers/momobridge/sandbox` | disbursements API at `/_sandbox/momobridge`; signed callbacks to `/webhooks/momobridge` |
+| FX rates | `RATES_PROVIDER=fixed` | `internal/rates/feed.go` | fixed mid rates from `RATES_USD_*` |
+| Email | `MAIL_PROVIDER=outbox` | `internal/mail` | messages land in `outbox_messages`, listed at **/_dev/outbox** |
+| Partner endpoints | seed data | `internal/devtools/receiver.go` | **/_dev/receiver** records every webhook attempt and answers with each partner's configured status |
+
+Sandbox magic values (account number or phone number endings that force an outcome) are in
+[docs/sandbox.md](docs/sandbox.md). The console's **Sandbox** page lists what each fake received and can force the
+next outcome.
+
 ## Tests and lint
 
 ```bash
