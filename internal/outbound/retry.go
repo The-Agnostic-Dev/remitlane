@@ -11,26 +11,23 @@ var ErrNotFailed = errors.New("outbound: delivery has not failed")
 // Retry gives a failed delivery one more attempt. It returns how many
 // deliveries were requeued.
 func (s *Service) Retry(ctx context.Context, deliveryID int64) (int, error) {
-	if _, err := s.store.Q.GetDeliveryForSend(ctx, deliveryID); err != nil {
-		return 0, err
-	}
-	ok, err := s.store.RequeueDelivery(ctx, deliveryID)
+	d, err := s.store.Q.GetDeliveryForSend(ctx, deliveryID)
 	if err != nil {
 		return 0, err
 	}
-	if !ok {
+	if d.Status != "failed" {
 		return 0, ErrNotFailed
 	}
-	if err := s.queue.Deliver(ctx, deliveryID, true); err != nil {
-		return 0, err
-	}
-	s.log.Info("requeued delivery", "delivery_id", deliveryID)
-	return 1, nil
+	return s.requeue(ctx, d.EndpointID)
 }
 
 // RetryEndpoint gives every failed delivery to an endpoint one more attempt,
 // for when a partner tells us their receiver is back up.
 func (s *Service) RetryEndpoint(ctx context.Context, endpointID int64) (int, error) {
+	return s.requeue(ctx, endpointID)
+}
+
+func (s *Service) requeue(ctx context.Context, endpointID int64) (int, error) {
 	ids, err := s.store.RequeueFailed(ctx, endpointID)
 	if err != nil {
 		return 0, err

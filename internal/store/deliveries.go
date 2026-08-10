@@ -55,16 +55,6 @@ func (s *Store) RequeueFailed(ctx context.Context, endpointID int64) ([]int64, e
 	return pgx.CollectRows(rows, pgx.RowTo[int64])
 }
 
-// RequeueDelivery moves one failed delivery back to queued. It reports
-// false when the delivery is not in the failed state.
-func (s *Store) RequeueDelivery(ctx context.Context, id int64) (bool, error) {
-	tag, err := s.Pool.Exec(ctx, `UPDATE webhook_deliveries SET status = 'queued' WHERE id = $1 AND status = 'failed'`, id)
-	if err != nil {
-		return false, err
-	}
-	return tag.RowsAffected() == 1, nil
-}
-
 // CountFailedDeliveries counts failed deliveries per partner id.
 func (s *Store) CountFailedDeliveries(ctx context.Context) (map[string]int, error) {
 	rows, err := s.Pool.Query(ctx, `
