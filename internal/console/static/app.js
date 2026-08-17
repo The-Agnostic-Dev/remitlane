@@ -16,6 +16,16 @@
     })
   })
 
+  // Stop double posts: disable submit buttons once a POST form is sent.
+  document.querySelectorAll('form[method="post"]').forEach(function (form) {
+    form.addEventListener('submit', function (ev) {
+      if (ev.defaultPrevented) return
+      form.querySelectorAll('button[type="submit"], button:not([type])').forEach(function (b) {
+        b.disabled = true
+      })
+    })
+  })
+
   // Flash messages fade after a while.
   var flash = document.querySelector('.flash.ok')
   if (flash) {
