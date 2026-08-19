@@ -82,9 +82,10 @@ button:disabled { opacity: .6; cursor: wait; }
 .bar span { display: block; height: 100%; background: var(--brand); max-width: 100%; }
 .hints { margin: 0 0 12px; padding-left: 18px; color: #475467; }
 
-.flash { padding: 10px 14px; border-radius: 8px; margin: 0 0 16px; border: 1px solid; }
+.flash { padding: 10px 14px; border-radius: 8px; margin: 0 0 16px; border: 1px solid; transition: opacity 1s; }
 .flash.ok { background: #ecfdf3; border-color: #abefc6; color: var(--ok); }
 .flash.error { background: #fef3f2; border-color: #fecdca; color: var(--bad); }
+.flash.fade { opacity: 0; }
 
 .login { max-width: 360px; margin: 80px auto; background: var(--card); padding: 28px; border-radius: 12px; border: 1px solid var(--line); }
 .login form { display: flex; flex-direction: column; gap: 8px; }
