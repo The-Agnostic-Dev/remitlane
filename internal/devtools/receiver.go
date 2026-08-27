@@ -57,6 +57,10 @@ func (t *Tools) configure(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	if r.Header.Get("Accept") == "application/json" {
+		httpx.WriteJSON(w, http.StatusOK, map[string]any{"slug": slug, "respond_with": code})
+		return
+	}
 	http.Redirect(w, r, "/_dev/receiver", http.StatusSeeOther)
 }
 
