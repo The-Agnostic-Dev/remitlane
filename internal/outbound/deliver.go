@@ -79,6 +79,7 @@ func (s *Service) send(ctx context.Context, d db.GetDeliveryForSendRow, attempt 
 	req.Header.Set("User-Agent", "Remitlane-Webhooks/1.4")
 	req.Header.Set("Remitlane-Event-Id", d.EventID)
 	req.Header.Set("Remitlane-Event-Type", d.Type)
+	req.Header.Set("Remitlane-Delivery-Attempt", fmt.Sprint(attempt))
 	req.Header.Set(SignatureHeader, Sign(d.Secret, time.Now(), d.Payload))
 	resp, err := s.http.Do(req)
 	if err != nil {
