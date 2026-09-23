@@ -192,6 +192,19 @@ Response `201`: `{"id": "bat_...", "object": "batch", "reference", "item_count",
 
 `held_minor` is money reserved for payouts in flight.
 
+`GET /limits`
+
+```json
+{
+  "object": "limits", "currency": "USD", "daily_limit_minor": 3000000, "used_today_minor": 27383,
+  "remaining_today_minor": 2972617, "window_start": "2026-11-05T23:00:00Z", "window_end": "2026-11-06T23:00:00Z",
+  "time_zone": "Africa/Lagos"
+}
+```
+
+The daily limit is in USD and the day runs from midnight to midnight **Lagos time (WAT)**, whatever your own time
+zone. Payouts in other currencies count at the mid rate; failed payouts do not count.
+
 ## Webhooks
 
 We POST events to your endpoint:

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Remitlane API
-  version: "1.5"
+  version: "1.6"
   description: |
     Quote and send payouts to bank accounts and mobile money in Nigeria, Kenya, Ghana and Uganda.
     Amounts are integers in minor units (UGX has no minor unit). See docs/api.md for the narrative guide.
