@@ -169,6 +169,11 @@ The store and payout service tests use the Postgres database in `DATABASE_URL` a
 throwaway database. CI (`.github/workflows/ci.yml`) runs lint, the full test suite against a Postgres service, and a
 Docker build on every pull request and on `main`.
 
+## Changing queries
+
+Edit `internal/db/queries/*.sql` (or add a migration in `migrations/`) and run `make sqlc` (sqlc 1.29). Commit the
+generated files. Queries with optional filters go in `internal/store` instead.
+
 ## Configuration
 
 Everything is an environment variable with a development default; see [.env.example](.env.example) for the full
