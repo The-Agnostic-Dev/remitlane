@@ -9,7 +9,8 @@
 
 1. Open the payout in the console. The timeline shows every status change and its source (`api`, `swiftpay`,
    `momobridge`, `poller`). The "Partner webhooks" table shows what we told the partner.
-2. Providers page: is the provider sending webhooks at all?
+2. Providers page: is the provider sending webhooks at all? Look at **Bad signatures**: a non-zero count means
+   webhooks arrive but we refuse them. Check the webhook secret in the secret store matches the provider dashboard.
 3. If webhooks stopped entirely, check the provider's status page and our ingress logs for `/webhooks/<provider>`.
 
 ## Fix
