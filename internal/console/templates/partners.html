@@ -1,7 +1,7 @@
 {{define "content"}}
 <h1>Partners</h1>
 <table class="grid">
-  <thead><tr><th>Partner</th><th>Country</th><th>Balances (available / held)</th><th class="num">Daily limit</th></tr></thead>
+  <thead><tr><th>Partner</th><th>Country</th><th>Balances (available / held)</th><th class="num">Daily limit</th><th class="num">Failed webhooks</th></tr></thead>
   <tbody>
   {{range .Data}}
     <tr data-partner="{{.Partner.Slug}}">
@@ -9,6 +9,7 @@
       <td>{{.Partner.Country}}</td>
       <td>{{range .Balances}}<div class="balance" data-currency="{{.Currency}}"><span class="num">{{money .Available (print .Currency)}}</span> <span class="sub">/ {{money .Held (print .Currency)}} held</span></div>{{end}}</td>
       <td class="num">{{money .Partner.DailyLimitUsdMinor "USD"}}</td>
+      <td class="num {{if .FailedWebhooks}}bad{{end}}">{{.FailedWebhooks}}</td>
     </tr>
   {{end}}
   </tbody>
