@@ -11,7 +11,7 @@ belonged to.
 ## Decision
 
 All "per day" rules use the business time zone, `BUSINESS_TZ` (default `Africa/Lagos`, WAT, UTC+1, no daylight
-saving), whatever zone the server or the partner is in:
+saving), whatever zone the server, the database session or the partner is in:
 
 - daily payout limits (`GET /v1/limits` returns the window),
 - the reconciliation report and its nightly run,
