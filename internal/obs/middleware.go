@@ -50,7 +50,7 @@ func Middleware(log *slog.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			id := r.Header.Get("X-Request-Id")
-			if id == "" {
+			if id == "" || len(id) > 64 {
 				id = newID()
 			}
 			w.Header().Set("X-Request-Id", id)
