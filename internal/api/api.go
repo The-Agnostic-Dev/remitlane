@@ -85,6 +85,7 @@ func (a *API) limiter(partnerID string) *rate.Limiter {
 func (a *API) rateLimit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if a.perMinute > 0 && !a.limiter(partnerFrom(r.Context()).ID).Allow() {
+			w.Header().Set("Retry-After", "1")
 			writeError(w, r, http.StatusTooManyRequests, "rate_limited", "too many requests; slow down")
 			return
 		}
