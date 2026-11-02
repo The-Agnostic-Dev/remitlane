@@ -54,7 +54,7 @@ func (e *env) dur(key string, def time.Duration) time.Duration {
 	}
 	d, err := time.ParseDuration(v)
 	if err != nil {
-		e.errs = append(e.errs, fmt.Errorf("%s: %q is not a duration", key, v))
+		e.errs = append(e.errs, fmt.Errorf("%s: %q is not a duration like 30s or 15m", key, v))
 		return def
 	}
 	return d
